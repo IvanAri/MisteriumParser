@@ -1,5 +1,3 @@
-# Here we go testing a new functionality
-
 from bs4 import BeautifulSoup
 
 from HTMLReader.Interface import getPageDecodedContent
@@ -10,7 +8,13 @@ url = "http://misterium-rpg.ru/viewtopic.php?id=1572"
 
 page = getPageDecodedContent(url)
 
-parser = BaseClassesParser()
-parser.feed(page)
+soup = BeautifulSoup(page, 'html.parser')
+#print(soup.prettify())
+#print(soup.find_all("div", "post-content"))
 
-parser.showResultingContent()
+parser = BaseClassesParser
+
+for post in soup.find_all("div", "post-content"):
+    # print(post)
+    parser.feed(post)
+    pass

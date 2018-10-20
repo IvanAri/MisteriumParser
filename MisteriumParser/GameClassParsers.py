@@ -2,7 +2,9 @@ from HTMLReader.BasePostContentParser import BasePostContentParser
 from collections import deque
 
 import re
-from MisteriumParser.PrecompiledExpressions import EXPERIENCE_EXPR, LONE_WORD_EXPR, FINISH_EXPRESSIONS
+from MisteriumParser.PrecompiledExpressions import EXPERIENCE_EXPR, FINISH_EXPRESSIONS, \
+    WORD_COUNT_EXPRESSIONS, SPECIAL_WORDS_EXPRESSIONS
+
 
 class BaseClassesParser(BasePostContentParser):
 
@@ -104,19 +106,21 @@ class BaseClassesParser(BasePostContentParser):
                 self.threeLineSegment[lineIndex-1] += " баллов опыта"
                 self.threeLineSegment[lineIndex] = ""
                 return True
-            else:
-                return False
+
+    def special_word_handler(self, line):
+        if any(expr.match(line) for expr in SPECIAL_WORDS_EXPRESSIONS):
+            return True
 
     # TODO: i_belekhov убираем специальные слова из этого обработчика
     def loneWordHandler(self, line):
-        if LONE_WORD_EXPR.match(line):
+        WCE = WORD_COUNT_EXPRESSIONS
+        if WCE.SINGLE_NON_SPECIAL_WORD_EXPR.match(line) and not WCE.DOUBLE_WORD_EXPR.match(line):
             lineIndex = self.threeLineSegment.index(line)
             if lineIndex >= 1:
                 self.threeLineSegment[lineIndex-1] += " " + line
                 self.threeLineSegment[lineIndex] = ""
                 return True
-            else:
-                return False
+
 
     # ========================= startsWith handlers ====================================================================
     def general_startswith_handler(self, line):
@@ -163,12 +167,15 @@ class BaseClassesParser(BasePostContentParser):
         "-",
     )
 
+    # Расположение в этом тупле имеет значение. Те что идут раньше - обрабатываются раньше
     LINE_MATCH_HANDLERS = (
+        special_word_handler,
         experience_handler,
         loneWordHandler,
     )
 
-    LINE_ALL_HANDLERS = LINE_STARTSWITH_HANDLERS + LINE_ENDSWITH_HANDLERS + LINE_MATCH_HANDLERS
+    # Сначала точные совпадения, потом начало линии, потом конец
+    LINE_ALL_HANDLERS = LINE_MATCH_HANDLERS + LINE_STARTSWITH_HANDLERS + LINE_ENDSWITH_HANDLERS
 
     # Подразумевается, что если line удовлетворяет этим паттернам, то её надо
     # флашить как готовую и переходить к обработке следующих строк
