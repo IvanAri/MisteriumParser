@@ -11,3 +11,6 @@ class PostContent:
     def add_line(self, line):
         if line:
             self.content.append(line)
+
+    def get_content(self):
+        return self.content

@@ -103,6 +103,7 @@ ABILITY_NAMES = (
 TECHNICAL_SINGLE_WORDS = (
     "пассивн",
     "активн",
+    "описан",
 )
 
 CHARACTERISTICS = (

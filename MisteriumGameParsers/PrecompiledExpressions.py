@@ -1,5 +1,5 @@
 import re
-from MisteriumParser.SpecialWordsConstants import SPECIAL_NAMES, MAIN_CLASSES_NAMES
+from MisteriumGameParsers.SpecialWordsConstants import SPECIAL_NAMES
 
 EXPERIENCE_EXPR = re.compile('балл[а-я]+\sопыт[а-я]+', re.IGNORECASE)
 

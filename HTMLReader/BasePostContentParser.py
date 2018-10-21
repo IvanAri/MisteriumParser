@@ -1,5 +1,5 @@
 from Lib.html import parser
-from MisteriumParser.UtilityClasses import PostContent
+from RawHTMLParser.UtilityClasses import PostContent
 
 LIB_PARSER = parser.HTMLParser
 

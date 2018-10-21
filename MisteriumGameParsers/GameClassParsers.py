@@ -1,8 +1,7 @@
 from HTMLReader.BasePostContentParser import BasePostContentParser
 from collections import deque
 
-import re
-from MisteriumParser.PrecompiledExpressions import EXPERIENCE_EXPR, FINISH_EXPRESSIONS, \
+from MisteriumGameParsers.PrecompiledExpressions import EXPERIENCE_EXPR, FINISH_EXPRESSIONS, \
     WORD_COUNT_EXPRESSIONS, SPECIAL_WORDS_EXPRESSIONS
 
 # TODO: i_belekhov remake this class to work with strings and post content itself and not a feed from parser
