@@ -1,5 +1,5 @@
 import re
-from MisteriumParser.SpecialWordsConstants import SPECIAL_NAMES
+from MisteriumParser.SpecialWordsConstants import SPECIAL_NAMES, MAIN_CLASSES_NAMES
 
 EXPERIENCE_EXPR = re.compile('балл[а-я]+\sопыт[а-я]+', re.IGNORECASE)
 
@@ -16,7 +16,7 @@ ACTIVE_ABILITY_EXPR = re.compile('активн[а-я]+\s[-]перезаряд[а
 SENTENCE_EXPRESSION = re.compile("([а-я]+[()!\s,;]*)*[.!?]", re.IGNORECASE)
 
 def makeSpecialWordsExpressions(specialWord):
-    return re.compile("%s[а-я]*"%specialWord, re.IGNORECASE)
+    return re.compile("%s[а-я]*" % specialWord, re.IGNORECASE)
 
 for specialWord in SPECIAL_NAMES:
     SPECIAL_WORDS_EXPRESSIONS += (

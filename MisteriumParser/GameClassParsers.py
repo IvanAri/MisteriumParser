@@ -5,6 +5,7 @@ import re
 from MisteriumParser.PrecompiledExpressions import EXPERIENCE_EXPR, FINISH_EXPRESSIONS, \
     WORD_COUNT_EXPRESSIONS, SPECIAL_WORDS_EXPRESSIONS
 
+# TODO: i_belekhov remake this class to work with strings and post content itself and not a feed from parser
 
 class BaseClassesParser(BasePostContentParser):
 
@@ -107,6 +108,8 @@ class BaseClassesParser(BasePostContentParser):
                 self.threeLineSegment[lineIndex] = ""
                 return True
 
+
+
     def special_word_handler(self, line):
         if any(expr.match(line) for expr in SPECIAL_WORDS_EXPRESSIONS):
             return True
@@ -156,7 +159,8 @@ class BaseClassesParser(BasePostContentParser):
 
     STARTSWITH = (
         "-",
-        "."
+        ".",
+        ","
     )
 
     LINE_ENDSWITH_HANDLERS = (

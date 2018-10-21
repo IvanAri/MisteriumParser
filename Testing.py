@@ -10,7 +10,11 @@ url = "http://misterium-rpg.ru/viewtopic.php?id=1572"
 
 page = getPageDecodedContent(url)
 
-parser = BaseClassesParser()
+# parser = BaseClassesParser()
+parser = BasePostContentParser()
 parser.feed(page)
 
-parser.showResultingContent()
+print("=== HERE STARTS GATHERED INFO ===")
+print(parser.show_posts_content())
+
+# parser.showResultingContent()
