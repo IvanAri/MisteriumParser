@@ -5,7 +5,7 @@ EXPERIENCE_EXPR = re.compile('балл[а-я]+\sопыт[а-я]+', re.IGNORECASE
 
 class WORD_COUNT_EXPRESSIONS:
     SINGLE_NON_SPECIAL_WORD_EXPR = re.compile('[а-я]+', re.IGNORECASE)
-    DOUBLE_WORD_EXPR = re.compile("[а-я]+\s[а-я]+", re.IGNORECASE)
+    DOUBLE_WORD_EXPR = re.compile("[а-я]+\s[0-9а-я]+", re.IGNORECASE)
 
 # Здесь храним выражения описывающие готовую строку, которую уже не надо обрабатывать
 FINISH_EXPRESSIONS = ()

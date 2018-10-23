@@ -3,6 +3,7 @@ import json
 
 from MisteriumGameParsers.PrecompiledExpressions import EXPERIENCE_EXPR, FINISH_EXPRESSIONS, \
     WORD_COUNT_EXPRESSIONS, SPECIAL_WORDS_EXPRESSIONS
+import copy
 
 # TODO: i_belekhov remake this class to work with strings and post content itself and not a feed from parser
 # TODO: in the end we should have a data structure converted to JSon for further use
@@ -12,6 +13,17 @@ class BasicParser:
     def __init__(self):
         self.__postContent = [] # list of strings
         self.threeLineSegment = deque(maxlen=3)
+
+        self.initLocalProperties(self.__class__)
+
+
+    def initLocalProperties(self, classRef):
+        self.STARTSWITH = getattr(classRef, "STARTSWITH")
+        self.ENDSWITH = getattr(classRef, "ENDSWITH")
+        self.LINE_STARTSWITH_HANDLERS = getattr(classRef, "LINE_STARTSWITH_HANDLERS")
+        self.LINE_ENDSWITH_HANDLERS = getattr(classRef, "LINE_ENDSWITH_HANDLERS")
+        self.LINE_MATCH_HANDLERS = getattr(classRef, "LINE_MATCH_HANDLERS")
+        self.LINE_ALL_HANDLERS = getattr(classRef, "LINE_ALL_HANDLERS")
 
     # In this method we do main processing
     def process(self, rawData):
@@ -73,23 +85,29 @@ class BasicParser:
         for line in self.__postContent:
             print(line)
 
+    def getContentAndCleanUp(self):
+        postContent = copy.deepcopy(self.__postContent)
+        self.__postContent.clear()
+        self.threeLineSegment.clear()
+        return postContent
+
     # ========================= Processing =============================================================================
 
     # Обобщение обработчиков выражений
     def processLine(self, line):
-        for handler in BasicParser.LINE_ALL_HANDLERS:
+        for handler in self.LINE_ALL_HANDLERS:
             if handler(self, line):
                 return True
         return False
 
     def processLineStartsWith(self, line):
-        for handler in BasicParser.LINE_STARTSWITH_HANDLERS:
+        for handler in self.LINE_STARTSWITH_HANDLERS:
             if handler(self, line):
                 return True
         return False
 
     def processLineEndsWith(self, line):
-        for handler in BasicParser.LINE_ENDSWITH_HANDLERS:
+        for handler in self.LINE_ENDSWITH_HANDLERS:
             if handler(self, line):
                 return True
         return False
@@ -116,7 +134,7 @@ class BasicParser:
 
     # ========================= startsWith handlers ====================================================================
     def general_startswith_handler(self, line):
-        for start in BasicParser.STARTSWITH:
+        for start in self.STARTSWITH:
             if line.startswith(start):
                 lineIndex = self.threeLineSegment.index(line)
                 if lineIndex > 0:
@@ -129,7 +147,7 @@ class BasicParser:
 
     # ========================= endsWith handlers ======================================================================
     def general_endswith_handler(self, line, endsWith=None):
-        for end in BasicParser.ENDSWITH:
+        for end in self.ENDSWITH:
             if line.endswith(end):
                 lineIndex = self.threeLineSegment.index(line)
                 if lineIndex == 1:
