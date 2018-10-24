@@ -10,6 +10,7 @@ class WORD_COUNT_EXPRESSIONS:
 # Здесь храним выражения описывающие готовую строку, которую уже не надо обрабатывать
 FINISH_EXPRESSIONS = ()
 SPECIAL_WORDS_EXPRESSIONS = ()
+CLASS_NAME_EXPRESSIONS = ()
 
 LEVEL_EXP_EXPRESSION = re.compile('[1-9]+\sуровень\s[-]\s[0-9]+\sбал[а-я]+\sопы[а-я]+', re.IGNORECASE)
 ACTIVE_ABILITY_EXPR = re.compile('активн[а-я]+\s[-]перезаряд[а-я]+\s[1-9]+]', re.IGNORECASE)
