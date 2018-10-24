@@ -11,12 +11,13 @@ from MisteriumGameParsers.PrecompiledExpressions import EXPERIENCE_EXPR, FINISH_
 class BaseClassParser(BasicParser):
     def __init__(self):
         super(BaseClassParser, self).__init__()
-        self.__classContent = {} # resulting BASIC_CLASS dict
+        self.__class = {} # resulting BASIC_CLASS dict
+        self.__text = [] # resulting list of prepared lines if needed
 
     # In this method we do main processing
     def extractClass(self, rawData):
         if not isinstance(rawData, list):
-            assert "BaseClassParser should be provided with list of strings as rawData"
+            assert "BaseClassParser extractClass should be provided with list of strings as rawData"
 
         for line in rawData:
             self.threeLineSegment.append(line)
@@ -25,6 +26,12 @@ class BaseClassParser(BasicParser):
         pass
 
     # special post pre-processing
+
+    def process(self, rawData):
+        if not isinstance(rawData, list):
+            assert "BaseClassParser process should be provided with list of strings as rawData"
+
+    pass
 
     def beautifySegment(self):
         pass

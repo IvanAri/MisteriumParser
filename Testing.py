@@ -22,6 +22,8 @@ for post in parser.get_posts():
     textPrettifyParser.process(post.get_content())
     posts.append(textPrettifyParser.getContentAndCleanUp())
 
+gameInfoParser = BaseClassParser()
+
 print("=== HERE STARTS GATHERED INFO ===")
 for post in posts:
     print("=== HERE STARTS NEW POST ===")

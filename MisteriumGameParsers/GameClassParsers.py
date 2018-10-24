@@ -6,6 +6,8 @@ from MisteriumGameParsers.PrecompiledExpressions import EXPERIENCE_EXPR, FINISH_
 
 # TODO: i_belekhov remake this class to work with strings and post content itself and not a feed from parser
 
+# ! ! ! DEPRECATED ! ! !
+
 class BaseClassesParser(BasePostContentParser):
 
     def __init__(self):
