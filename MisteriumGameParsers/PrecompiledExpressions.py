@@ -1,5 +1,9 @@
 import re
-from MisteriumGameParsers.SpecialWordsConstants import SPECIAL_NAMES
+from MisteriumGameParsers.SpecialWordsConstants import SPECIAL_NAMES, MAIN_CLASSES_NAMES
+from MisteriumGameParsers.SpecialWordsConstants import PREREQUISITES_GAMEPLAY, PREREQUISITES_CLASS, PREREQUISITES_LEVEL,\
+                                                        PREREQUISITES_LEVEL, PREREQUISITES_ABILITIES,\
+                                                        PREREQUISITES_CHARACTERISTICS, PREREQUISITES_WORDS
+
 
 EXPERIENCE_EXPR = re.compile('балл[а-я]+\sопыт[а-я]+', re.IGNORECASE)
 
@@ -10,7 +14,6 @@ class WORD_COUNT_EXPRESSIONS:
 # Здесь храним выражения описывающие готовую строку, которую уже не надо обрабатывать
 FINISH_EXPRESSIONS = ()
 SPECIAL_WORDS_EXPRESSIONS = ()
-CLASS_NAME_EXPRESSIONS = ()
 
 LEVEL_EXP_EXPRESSION = re.compile('[1-9]+\sуровень\s[-]\s[0-9]+\sбал[а-я]+\sопы[а-я]+', re.IGNORECASE)
 ACTIVE_ABILITY_EXPR = re.compile('активн[а-я]+\s[-]перезаряд[а-я]+\s[1-9]+]', re.IGNORECASE)
@@ -31,3 +34,31 @@ FINISH_EXPRESSIONS += (
     ACTIVE_ABILITY_EXPR,
     # SENTENCE_EXPRESSION
 )
+
+# отсюда идёт обработка для базовых классов
+
+CLASS_NAME_EXPRESSIONS = ()
+
+for specialWord in MAIN_CLASSES_NAMES:
+    CLASS_NAME_EXPRESSIONS += (
+        makeSpecialWordsExpressions(specialWord),
+    )
+
+PRQ_GAMEPLAY_EXPRESSION = re.compile("требуе[а-я]+\sотыгры[а-я]+", re.IGNORECASE)
+PRQ_LEVEL_EXPRESSION = re.compile("требуе[а-я]+\sуров[а-я]+", re.IGNORECASE)
+PRQ_CLASS_EXPRESSION = re.compile("требуе[а-я]+\sклас[а-я]+", re.IGNORECASE)
+PRQ_CHARACTERISCTIC_EXPRESSIONS = ()
+PRQ_ABILITY_EXPRESSIONS = ()
+
+def makePrerequisitesExpressions(specialWord):
+    return re.compile("требуе[а-я]+\s%s[а-я]+" % specialWord, re.IGNORECASE)
+
+for specialWord in PREREQUISITES_CHARACTERISTICS:
+    PRQ_CHARACTERISCTIC_EXPRESSIONS += (
+        makePrerequisitesExpressions(specialWord),
+    )
+
+for specialWord in PREREQUISITES_ABILITIES:
+    PRQ_ABILITY_EXPRESSIONS += (
+        makePrerequisitesExpressions(specialWord),
+    )

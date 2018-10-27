@@ -26,6 +26,13 @@ ATTRIBUTE_STRUCTURE = {
     "value": 0, # positive or negative int value
 }
 
+class ABILITY_PREREQUISITY:
+    def __init__(self):
+        self.__name = ""
+        self.__level = 0 # some int value that describes
+
+
+
 class PREREQUISITES:
 
     def __init__(self):
@@ -114,7 +121,7 @@ class PREREQUISITES:
                 "stamina"   : self.stamina,
                 "gift"      : self.gift,
             },
-            "behaviour": self.behaviour, # should be list of strings
+            "behaviour": self.behaviour, # should be string
         }
 
 class LEVEL:
@@ -160,7 +167,7 @@ class LEVEL:
 
     @property
     def prerequisites(self):
-        return self.__prerequisites
+        return self.__prerequisites.objToDict()
 
     @prerequisites.setter
     def prerequisites(self, prerequisitesObj):
@@ -178,6 +185,7 @@ class LEVEL:
             "prerequisites": self.prerequisites, # PREREQUISITES dict or obj that can be converted to dict
         }
 
+# ! ! ! NOT any attribute can be described as an object, that's why sometimes we will use game-description strings
 class ATTRIBUTE:
 
     def __init__(self):
