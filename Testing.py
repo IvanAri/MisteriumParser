@@ -25,6 +25,4 @@ for post in parser.get_posts():
 gameInfoParser = BaseClassParser()
 
 print("=== HERE STARTS GATHERED INFO ===")
-for post in posts:
-    print("=== HERE STARTS NEW POST ===")
-    print(post)
+print(posts[1])
