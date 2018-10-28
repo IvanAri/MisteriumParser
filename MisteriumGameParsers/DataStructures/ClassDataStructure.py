@@ -2,8 +2,7 @@
 # TODO: Добавь для Далендора полное содержание распаршеных постов
 
 
-from DataStructures.Utilities import LEVEL, ATTRIBUTE, PREREQUISITES
-from DataStructures.AbilityDataStructure import GENERAL_ABILITY
+from MisteriumGameParsers.DataStructures import PREREQUISITES
 
 BASIC_CLASS_STRUCTURE = {
     "name": "Some class name", #
