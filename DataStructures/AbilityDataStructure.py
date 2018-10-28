@@ -11,6 +11,31 @@ ABILITY = {
     "levels": [], #list of LEVEL dicts or objs
 }
 
+class ABILITY_DESCRIPTION:
+    def __init__(self):
+        self.__name = "" # just some string
+        self.__level = "" # some level, that can be string or number
+
+    @property
+    def name(self):
+        return self.__name
+
+    @name.setter
+    def name(self, value):
+        self.__name = value
+
+    @property
+    def level(self):
+        return self.__level
+
+    @level.setter
+    def level(self, value):
+        self.__level = value
+
+    # string converter
+    def getStringFromObj(self):
+        return "%s - %s" % (self.name, self.level)
+
 class GENERAL_ABILITY:
     def __init__(self):
         self.__name = ""

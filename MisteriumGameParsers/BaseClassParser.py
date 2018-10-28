@@ -1,10 +1,17 @@
 from collections import deque
 from MisteriumGameParsers.BasicParser import BasicParser
 from MisteriumGameParsers.PrecompiledExpressions import EXPERIENCE_EXPR, FINISH_EXPRESSIONS, \
-    WORD_COUNT_EXPRESSIONS, SPECIAL_WORDS_EXPRESSIONS, CLASS_NAME_EXPRESSIONS, PRQ_EXPRESSIONS, DESCRIPTION_EXPRESSION
+                                                WORD_COUNT_EXPRESSIONS, SPECIAL_WORDS_EXPRESSIONS,\
+                                                CLASS_NAME_EXPRESSIONS, PRQ_EXPRESSIONS, DESCRIPTION_START_EXPRESSION,\
+                                                CLASS_ATTRIBUTES_START_EXPRESSION, CLASS_ABILITIES_START_EXPRESSION
+from MisteriumGameParsers.PrecompiledExpressions import PRQ_LEVEL_EXPRESSION, PRQ_GAMEPLAY_EXPRESSION,\
+                                                        PRQ_CLASS_EXPRESSION, PRQ_CHARACTERISCTIC_EXPRESSIONS,\
+                                                        PRQ_ABILITY_EXPRESSIONS, PRQ_GENDER_EXPRESSION
+from MisteriumGameParsers.UtilityParsers import get_characteristic_from_line
 from DataStructures.ClassDataStructure import BASIC_CLASS
 from DataStructures.AbilityDataStructure import ABILITY
 from DataStructures.Utilities import LEVEL, PREREQUISITES
+from GameParameters.Characteristics import RUS_TO_ENGL_CHARACTERISCTICS
 
 import json
 
@@ -70,13 +77,9 @@ class BaseClassParser:
         # для каждой стадии вызываем своего обработчика.
         # обработка поточная, а поэтому если где-то прервалась итерация, значит мы накосячили
         for handler in BaseClassParser.STAGE_HANDLERS:
-            try:
-                handler()
-            except:
-                print("Something get wrong for stage: %s" % self.__stage)
-                break
+            handler(self)
 
-        print("==== EXTRACTING COMPLETE! ====")
+        self.show_class()
 
     def process(self, rawData):
         if not isinstance(rawData, list):
@@ -97,6 +100,10 @@ class BaseClassParser:
     def beautifySegment(self):
         pass
 
+    def show_class(self):
+        print("=== PARSED CLASS ===")
+        print(self.__gameClass.objToDict())
+
     # stage handlers
 
     def class_name_searcher(self):
@@ -105,6 +112,7 @@ class BaseClassParser:
                 self.__stage = BaseClassParser.CLASS_NAME_FOUND
                 self.__currentLineIndex = idx
                 self.class_name_handler(line)
+                return
 
     def class_name_handler(self, line):
         name = ""
@@ -119,32 +127,91 @@ class BaseClassParser:
         for idx, line in enumerate(self.__post[self.__currentLineIndex::]):
             if any(expr.match(line) for expr in PRQ_EXPRESSIONS):
                 self.__stage = BaseClassParser.PREREQUISITES_FOUND
-                self.__currentLineIndex = idx
-                self.__buffer_start_idx = idx
+                self.__currentLineIndex = self.__post.index(line)
                 self.__gameClass.prerequisites = PREREQUISITES()
 
-                descr_expr = DESCRIPTION_EXPRESSION
-                for index, search_line in enumerate(self.__post[self.__buffer_start_idx::]):
+                descr_expr = DESCRIPTION_START_EXPRESSION
+                for index, search_line in enumerate(self.__post[self.__currentLineIndex::]):
                     if descr_expr.match(search_line):
-                        self.__buffer_end_idx = index
+                        self.__currentLineIndex = self.__post.index(search_line)
                         break
                     self.__buffer.append(search_line)
                 self.prerequisites_handler(self.__buffer)
-        pass
+                return
 
     def prerequisites_handler(self, buffer):
         if not isinstance(buffer, list):
             assert "prerequisites_handler should be provided with list of strings"
 
+        for idx, line in enumerate(buffer):
+            for expr in PRQ_EXPRESSIONS:
+                if expr.match(line):
+                    # TODO: здесь начинается портянка из вариантов, которые потом как-нибудь надо разбить
+                    if expr == PRQ_LEVEL_EXPRESSION:
+                        self.__gameClass.prerequisites.level = int(buffer[idx+1])
+                    elif expr == PRQ_GENDER_EXPRESSION:
+                        self.__gameClass.prerequisites.gender = buffer[idx+1].strip()
+                    elif expr == PRQ_GAMEPLAY_EXPRESSION:
+                        self.__gameClass.prerequisites.behaviour = buffer[idx+1].strip()
+                    elif expr == PRQ_CLASS_EXPRESSION:
+                        self.__gameClass.prerequisites.gameClass = buffer[idx+1].strip()
+                    elif expr in PRQ_CHARACTERISCTIC_EXPRESSIONS:
+                        characteristic = get_characteristic_from_line(line)
+                        char_type = RUS_TO_ENGL_CHARACTERISCTICS[characteristic]
+                        value = int(buffer[idx+1]) # magic number cause of the structure of the post
+                        self.__gameClass.prerequisites.set_characteristic_value(char_type, value)
+                    elif expr in PRQ_ABILITY_EXPRESSIONS:
+                        self.__gameClass.prerequisites.abilities.append(buffer[idx+1])
 
-
-        pass
+        self.__stage = BaseClassParser.PREREQUISITES_PARSED
+        self.__buffer.clear()
 
     def description_searcher(self):
-        pass
+        expr = DESCRIPTION_START_EXPRESSION
+        for idx, line in enumerate(self.__post[self.__currentLineIndex::]):
+            if expr.match(line):
+                self.__stage = BaseClassParser.DESCRIPTION_FOUND
+                self.__currentLineIndex = self.__post.index(line)
+                self.description_handler(self.__post[self.__currentLineIndex+1])
+                return
+
+    def description_handler(self, line):
+        self.__gameClass.description = line
+        self.__currentLineIndex+=1
+        self.__stage = BaseClassParser.DESCRIPTION_PARSED
 
     def class_attributes_searcher(self):
-        pass
+        expr = CLASS_ATTRIBUTES_START_EXPRESSION
+        for idx, line in enumerate(self.__post[self.__currentLineIndex::]):
+            if expr.match(line):
+                # TODO: оставились на обработке аттрибутов, какие-то из них сможем запарсить сходу, какие-то нет.
+                #  Очень много специфичных формулировок
+                self.__stage = BaseClassParser.CLASS_ATTRIBUTES_FOUND
+                self.__currentLineIndex = self.__post.index(line)
+
+                ability_start_expression = CLASS_ABILITIES_START_EXPRESSION
+                for index, search_line in enumerate(self.__post[self.__currentLineIndex::]):
+                    if ability_start_expression.match(search_line):
+                        self.__currentLineIndex = self.__post.index(search_line)
+                        break
+                    self.__buffer.append(search_line)
+                self.class_attributes_handler(self.__buffer)
+                return
+
+    def class_attributes_handler(self, buffer):
+        if not isinstance(buffer, list):
+            assert "class_attributes_handler should be provided with list of strings"
+
+        for idx, line in enumerate(buffer):
+            for expr in PRQ_EXPRESSIONS:
+                if expr.match(line):
+                    # TODO: здесь начинается портянка из вариантов, которые потом как-нибудь надо разбить
+                    pass
+                else:
+                    self.__gameClass.string_attributes.append(line)
+
+        self.__stage = BaseClassParser.CLASS_ATTRIBUTES_PARSED
+        self.__buffer.clear()
 
     def abilities_searcher(self):
         pass
@@ -158,15 +225,15 @@ class BaseClassParser:
     def job_finished_handler(self):
         pass
 
-    STAGE_HANDLERS = {
-        NEW_POST: class_name_searcher,
-        CLASS_NAME_PARSED: prerequisites_searcher,
-        PREREQUISITES_PARSED: description_searcher,
-        DESCRIPTION_PARSED: class_attributes_searcher,
-        CLASS_ATTRIBUTES_PARSED: abilities_searcher,
-        ABILITIES_PARSED: class_verifier,
-        CLASS_PARSED: class_converter,
-        CLASS_CONVERTED: job_finished_handler,
-    }
+    STAGE_HANDLERS = (
+        class_name_searcher,
+        prerequisites_searcher,
+        description_searcher,
+        class_attributes_searcher,
+        abilities_searcher,
+        class_verifier,
+        class_converter,
+        job_finished_handler,
+    )
 
 

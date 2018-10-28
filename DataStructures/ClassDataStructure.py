@@ -1,4 +1,6 @@
 # not finale data structure, that is easy to work with
+# TODO: Добавь для Далендора полное содержание распаршеных постов
+
 
 from DataStructures.Utilities import LEVEL, ATTRIBUTE, PREREQUISITES
 from DataStructures.AbilityDataStructure import GENERAL_ABILITY
@@ -54,7 +56,7 @@ class BASIC_CLASS:
 
     @property
     def prerequisites(self):
-        return self.__prerequisites.objToDict()
+        return self.__prerequisites
 
     @prerequisites.setter
     def prerequisites(self, prerequisitesObj):
@@ -76,7 +78,7 @@ class BASIC_CLASS:
         return {
             "name": self.name,  # name string
             "description": self.description,  # non-mechanic description string
-            "prerequisites": self.prerequisites,  # PREREQUISITES dict
+            "prerequisites": self.__prerequisites.objToDict(),  # PREREQUISITES dict
             "string_attributes": self.__string_attributes,
             "passive_attributes": [attr.objToDict() for attr in self.__passive_attributes],  # should be list of ATTRIBUTE objs
             "abilities": {

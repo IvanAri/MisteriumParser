@@ -117,7 +117,7 @@ class BasicParser:
     def loneWordHandler(self, line):
         WCE = WORD_COUNT_EXPRESSIONS
         if WCE.SINGLE_NON_SPECIAL_WORD_EXPR.match(line) and not WCE.DOUBLE_WORD_EXPR.match(line) \
-                and not any(expr.match(line) for expr in SPECIAL_WORDS_EXPRESSIONS):
+                and not any(expr.match(line) for expr in SPECIAL_WORDS_EXPRESSIONS) and not WCE.DOUBLE_EXPR.match(line):
             lineIndex = self.threeLineSegment.index(line)
             if lineIndex >= 1:
                 self.threeLineSegment[lineIndex-1] += " " + line

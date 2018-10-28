@@ -1,17 +1,24 @@
 PREREQUISITES_STRUCTURE = {
         "level": 100, # should be int
         "class": "some class name", # string with class name
+        "gender": "man or woman", # gender prerequisity, yep
         "characteristics": {
             "strength" : 0, # some ints
             "agility" : 0,
             "stamina" : 0,
             "gift" : 0,
         },
+        "abilities": [], # list of ability description strings like "Кулак духа - 4 уровень"
         "behaviour": [], # should be list of strings
     }
 
 LEVEL_STRUCTURE = {
     "level": 0, # int with actual level number
+    "cost": {
+        "experience": 0,
+        "honour": 0,
+        "loyalty": 0,
+    },
     "attributes": [], # list of attributes objects that can be converted to game characteristics
     "mechanic": "some description string", # general mechanic description, if can't be parsed into bonuses
     "prerequisites": {}, # PREREQUISITES dict or obj that can be converted to dict
@@ -26,24 +33,19 @@ ATTRIBUTE_STRUCTURE = {
     "value": 0, # positive or negative int value
 }
 
-class ABILITY_PREREQUISITY:
-    def __init__(self):
-        self.__name = ""
-        self.__level = 0 # some int value that describes
-
-
-
 class PREREQUISITES:
 
     def __init__(self):
         self.__level = 0
         self.__gameClass = ""
+        self.__gender = ""
         self.__mainCharacteristics = {
             "strength": 0,  # some ints
             "agility": 0,
             "stamina": 0,
             "gift": 0,
         }
+        self.__abilities = [] # should be a list of strings that suit the ABILITY_DESCRIPTION
         self.__behaviour = "" # should be a string
 
     # Setters and getters
@@ -66,6 +68,17 @@ class PREREQUISITES:
             self.__gameClass = gameClassName
         else:
             assert "Something went wrong %s is not a valid gameClassName" % gameClassName
+
+    @property
+    def gender(self):
+        return self.__gender
+
+    @gender.setter
+    def gender(self, value):
+        self.__gender = value
+
+    def set_characteristic_value(self, char_type, value):
+        self.__mainCharacteristics[char_type] = value
 
     @property
     def strength(self):
@@ -100,6 +113,10 @@ class PREREQUISITES:
         self.__mainCharacteristics["gift"] = value
 
     @property
+    def abilities(self):
+        return self.__abilities
+
+    @property
     def behaviour(self):
         return self.__behaviour
 
@@ -115,15 +132,18 @@ class PREREQUISITES:
         return {
             "level": self.level, # should be int
             "class": self.gameClass, # string with class name
+            "gender": self.gender,
             "characteristics": {
                 "strength"  : self.strength, # some ints
                 "agility"   : self.agility,
                 "stamina"   : self.stamina,
                 "gift"      : self.gift,
             },
+            "abilities": self.abilities,
             "behaviour": self.behaviour, # should be string
         }
 
+# TODO: make a cost object in the future
 class LEVEL:
 
     def __init__(self):
@@ -131,7 +151,11 @@ class LEVEL:
         self.__attributes = {} # dict of ATTRIBUTE objects
         self.__mechanic = "" # mechanic string
         self.__prerequisites = None # should be a PREREQUISITES object
-
+        self.__cost = {
+            "experience": 0,
+            "honour": 0,
+            "loyalty": 0,
+        } # dict of costs
 
     # Setters and getters
 
@@ -176,10 +200,18 @@ class LEVEL:
         else:
             assert "Something went wrong %s is not a valid prerequisitesObj" % prerequisitesObj
 
+    @property
+    def cost(self):
+        return self.__cost
+
+    def set_cost(self, cost_type, value):
+        self.__cost[cost_type] = value
+
     # dict converter
     def objToDict(self):
         return {
             "level": self.level, # int with actual level number
+            "cost": self.cost, # dict with costs in exp and other types of game currencies
             "attributes": self.attributes, # list of attributes objects that can be converted to game characteristics
             "mechanic": self.mechanic, # general mechanic description, if can't be parsed into bonuses
             "prerequisites": self.prerequisites, # PREREQUISITES dict or obj that can be converted to dict
@@ -187,7 +219,7 @@ class LEVEL:
 
 # ! ! ! NOT any attribute can be described as an object, that's why sometimes we will use game-description strings
 class ATTRIBUTE:
-
+    
     def __init__(self):
         self.__type = ""
         self.__additive = False
