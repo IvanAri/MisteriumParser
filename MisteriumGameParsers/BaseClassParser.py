@@ -1,19 +1,13 @@
-from collections import deque
-from MisteriumGameParsers.BasicParser import BasicParser
-from MisteriumGameParsers.PrecompiledExpressions import EXPERIENCE_EXPR, FINISH_EXPRESSIONS, \
-                                                WORD_COUNT_EXPRESSIONS, SPECIAL_WORDS_EXPRESSIONS,\
-                                                CLASS_NAME_EXPRESSIONS, PRQ_EXPRESSIONS, DESCRIPTION_START_EXPRESSION,\
+from MisteriumGameParsers.PrecompiledExpressions import CLASS_NAME_EXPRESSIONS, PRQ_EXPRESSIONS, DESCRIPTION_START_EXPRESSION,\
                                                 CLASS_ATTRIBUTES_START_EXPRESSION, CLASS_ABILITIES_START_EXPRESSION
 from MisteriumGameParsers.PrecompiledExpressions import PRQ_LEVEL_EXPRESSION, PRQ_GAMEPLAY_EXPRESSION,\
                                                         PRQ_CLASS_EXPRESSION, PRQ_CHARACTERISCTIC_EXPRESSIONS,\
                                                         PRQ_ABILITY_EXPRESSIONS, PRQ_GENDER_EXPRESSION
 from MisteriumGameParsers.UtilityParsers import get_characteristic_from_line
 from DataStructures.ClassDataStructure import BASIC_CLASS
-from DataStructures.AbilityDataStructure import ABILITY
-from DataStructures.Utilities import LEVEL, PREREQUISITES
-from GameParameters.Characteristics import RUS_TO_ENGL_CHARACTERISCTICS
+from DataStructures.Utilities import PREREQUISITES
+from MisteriumGameParsers.GameParameters.Characteristics import RUS_TO_ENGL_CHARACTERISCTICS
 
-import json
 
 # TODO: i_belekhov remake this class to work with strings and post content itself and not a feed from parser
 # TODO: in the end we should have a data structure converted to JSon for further use

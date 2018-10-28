@@ -219,11 +219,16 @@ class LEVEL:
 
 # ! ! ! NOT any attribute can be described as an object, that's why sometimes we will use game-description strings
 class ATTRIBUTE:
-    
+
     def __init__(self):
         self.__type = ""
+        self.__game_action = ""
+        self.__impact = ""
+        self.__parameter = None # should be a PARAMETER obj
+        self.__specificator = "" # some specificator name
         self.__additive = False
         self.__multiplicative = False
+        self.__sign = 1  # 1 or -1
         self.__value = 0
 
     # Setters and getters
@@ -232,27 +237,20 @@ class ATTRIBUTE:
     def type(self):
         return self.__type
 
-    @type.setter
-    def type(self, attributeName):
-        if isinstance(attributeName, str):
-            self.__type += '\n' + attributeName
-        else:
-            assert "Something went wrong %s is not a valid attributeName" % attributeName
-
     @property
-    def isAdditive(self):
+    def is_additive(self):
         return self.__additive
 
-    @isAdditive.setter
-    def isAdditive(self, value):
+    @is_additive.setter
+    def is_additive(self, value):
         self.__additive = value
 
     @property
-    def isMultiplicative(self):
+    def is_multiplicative(self):
         return self.__multiplicative
 
-    @isMultiplicative.setter
-    def isMultiplicative(self, value):
+    @is_multiplicative.setter
+    def is_multiplicative(self, value):
         self.__multiplicative = value
 
     @property
@@ -262,15 +260,24 @@ class ATTRIBUTE:
     @value.setter
     def value(self, attributeValue):
         self.__additive = attributeValue
+        
+    @property
+    def sign(self):
+        return self.__sign
+    
+    @sign.setter
+    def sign(self, sign_modificator):
+        self.__sign = sign_modificator
 
     # dict converter
     def objToDict(self):
         return {
             "type": self.type,
-            "isAdditive": self.isAdditive,  # True or False depending on mechanic
-            "isMultiplicative": self.isMultiplicative,
+            "is_additive": self.is_additive,  # True or False depending on mechanic
+            "is_multiplicative": self.is_multiplicative,
             # True or False depending on mechanic structure.
             # Additive and multiplicative can't be True together
+            "sign": self.sign, # sign for further calculations, can be 1 or -1
             "value": self.value,  # positive or negative int value
         }
 

@@ -1,6 +1,6 @@
 # модификаторы знака (те штуки, которые делают значение положительным или отрицательным)
 
-POSITIVE_VALUE_QUANTIFICATORS = (
+POSITIVE_VALUE_QUALIFICATORS = (
     '+',
     'повышае',
     'пребавляе',
@@ -8,7 +8,7 @@ POSITIVE_VALUE_QUANTIFICATORS = (
     'больш'
 )
 
-NEGATIVE_VALUE_QUANTIFICATORS = (
+NEGATIVE_VALUE_QUALIFICATORS = (
     '-',
     'понижае',
     'отнимае',
@@ -18,7 +18,5 @@ NEGATIVE_VALUE_QUANTIFICATORS = (
 
 
 
-class ATTRIBUTE:
 
-    def __init__(self, **kwargs):
-        pass
+
