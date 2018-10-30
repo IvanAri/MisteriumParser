@@ -221,11 +221,12 @@ class LEVEL:
 class ATTRIBUTE:
 
     def __init__(self):
-        self.__type = ""
+        self.__name = ""
         self.__game_action = ""
         self.__impact = ""
         self.__parameter = None # should be a PARAMETER obj
-        self.__specificator = "" # some specificator name
+        self.__specifier = "" # some specificator name
+        self.__basic = False
         self.__additive = False
         self.__multiplicative = False
         self.__sign = 1  # 1 or -1
@@ -234,8 +235,16 @@ class ATTRIBUTE:
     # Setters and getters
 
     @property
-    def type(self):
-        return self.__type
+    def name(self):
+        return self.__name
+
+    @property
+    def game_action(self):
+        return self.__game_action
+
+    @game_action.setter
+    def game_action(self, value):
+        self.__game_action = value
 
     @property
     def is_additive(self):

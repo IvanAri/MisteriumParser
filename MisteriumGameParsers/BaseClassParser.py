@@ -4,8 +4,8 @@ from MisteriumGameParsers.PrecompiledExpressions import PRQ_LEVEL_EXPRESSION, PR
                                                         PRQ_CLASS_EXPRESSION, PRQ_CHARACTERISCTIC_EXPRESSIONS,\
                                                         PRQ_ABILITY_EXPRESSIONS, PRQ_GENDER_EXPRESSION
 from MisteriumGameParsers.UtilityParsers import get_characteristic_from_line
-from MisteriumGameParsers.DataStructures import BASIC_CLASS
-from MisteriumGameParsers.DataStructures import PREREQUISITES
+from MisteriumGameParsers.DataStructures.ClassDataStructure import BASIC_CLASS
+from MisteriumGameParsers.DataStructures.Utilities import PREREQUISITES
 from MisteriumGameParsers.GameParameters.Characteristics import RUS_TO_ENGL_CHARACTERISCTICS
 
 

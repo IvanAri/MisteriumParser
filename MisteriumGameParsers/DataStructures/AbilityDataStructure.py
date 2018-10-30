@@ -1,6 +1,6 @@
 # Abilities have levels so this file contains more then one structure xD
 
-from MisteriumGameParsers.DataStructures import PREREQUISITES, LEVEL
+from MisteriumGameParsers.DataStructures.Utilities import PREREQUISITES, LEVEL
 
 ABILITY = {
     "name": "some name", # string with abilities name
