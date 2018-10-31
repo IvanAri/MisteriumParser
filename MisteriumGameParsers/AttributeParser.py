@@ -1,20 +1,24 @@
-from MisteriumGameParsers.GameParameters import Attributes
+from MisteriumGameParsers.GameParameters import AttributesComponents
 from MisteriumGameParsers.DataStructures.Utilities import ATTRIBUTE
 
+# TODO: i_belekhov перенеси это в AttributesComponents
 # Классификация различных элементов аттрибута
 GAME_ACTIONS = "game_actions"
 GAME_ACTIONS_MODIFIERS = "game_actions_modifiers"
 GAME_ACTIONS_IMPACTS = "game_actions_impact_modifiers"
+SIGN_QUALIFIERS = "sign_qualifiers"
 EXPRESSIONS_BY_CATEGORIES = {
-    GAME_ACTIONS: Attributes.GAME_ACTIONS_CATEGORIES_EXPRESSIONS,
-    GAME_ACTIONS_MODIFIERS: Attributes.GAME_ACTIONS_MODIFIERS_CATEGORIES_EXPRESSIONS,
-    GAME_ACTIONS_IMPACTS: Attributes.GAME_ACTIONS_IMPACTS_CATEGORIES_EXPRESSIONS,
+    GAME_ACTIONS: AttributesComponents.GAME_ACTIONS_CATEGORIES_EXPRESSIONS,
+    GAME_ACTIONS_MODIFIERS: AttributesComponents.GAME_ACTIONS_MODIFIERS_CATEGORIES_EXPRESSIONS,
+    GAME_ACTIONS_IMPACTS: AttributesComponents.GAME_ACTIONS_IMPACTS_CATEGORIES_EXPRESSIONS,
+    SIGN_QUALIFIERS: AttributesComponents.SIGN_QUALIFIERS_CATEGORIES_EXPRESSIONS,
 }
 
 ALIASES_BY_CATEGORIES = {
-    GAME_ACTIONS: Attributes.GAME_ACTIONS_ALIASES,
-    GAME_ACTIONS_MODIFIERS: Attributes.GAME_ACTIONS_MODIFIERS_ALIASES,
-    GAME_ACTIONS_IMPACTS: Attributes.GAME_ACTIONS_IMPACTS_ALIASES,
+    GAME_ACTIONS: AttributesComponents.GAME_ACTIONS_ALIASES,
+    GAME_ACTIONS_MODIFIERS: AttributesComponents.GAME_ACTIONS_MODIFIERS_ALIASES,
+    GAME_ACTIONS_IMPACTS: AttributesComponents.GAME_ACTIONS_IMPACTS_ALIASES,
+    SIGN_QUALIFIERS: AttributesComponents.SIGN_QUALIFIERS_ALIASES,
 }
 
 class AttributeParser:
@@ -35,16 +39,18 @@ class AttributeParser:
         game_actions = self.find_game_action()
         game_actions_modifiers = self.find_game_action_modifiers()
         game_actions_impacts = self.find_game_action_impacts()
+        sign_qualifiers = self.find_parameters_sign()
         print('Game actions: ', game_actions)
         print('Game actions modifiers: ', game_actions_modifiers)
         print('Game actions impacts: ', game_actions_impacts)
+        print('Sign qualifiers: ', sign_qualifiers)
         print("!!! Закончили парсить аттрибутную строку !!!")
         pass
 
     # TODO: объединить методы в один, скармливать туда stage'ы
     def find_game_action(self):
         game_actions = []
-        for expr in Attributes.GAME_ACTIONS_EXPRESSIONS:
+        for expr in AttributesComponents.GAME_ACTIONS_EXPRESSIONS:
             res = expr.search(self.__attribute_string)
             if res:
                 game_action = self.search_alias(res.group(), GAME_ACTIONS)
@@ -53,7 +59,7 @@ class AttributeParser:
 
     def find_game_action_modifiers(self):
         game_actions_modifiers = []
-        for expr in Attributes.GAME_ACTIONS_MODIFIERS_EXPRESSIONS:
+        for expr in AttributesComponents.GAME_ACTIONS_MODIFIERS_EXPRESSIONS:
             res = expr.search(self.__attribute_string)
             if res:
                 game_action_modifier = self.search_alias(res.group(), GAME_ACTIONS_MODIFIERS)
@@ -62,12 +68,21 @@ class AttributeParser:
 
     def find_game_action_impacts(self):
         game_actions_impacts = []
-        for expr in Attributes.GAME_ACTIONS_IMPACTS_EXPRESSIONS:
+        for expr in AttributesComponents.GAME_ACTIONS_IMPACTS_EXPRESSIONS:
             res = expr.search(self.__attribute_string)
             if res:
                 game_action_impact = self.search_alias(res.group(), GAME_ACTIONS_IMPACTS)
                 game_actions_impacts.append(game_action_impact)
         return game_actions_impacts
+
+    def find_parameters_sign(self):
+        sign_qualifiers = []
+        for expr in AttributesComponents.SIGN_QUALIFIERS_EXPRESSIONS:
+            res = expr.search(self.__attribute_string)
+            if res:
+                sign_qualifier = self.search_alias(res.group(), SIGN_QUALIFIERS)
+                sign_qualifiers.append(sign_qualifier)
+        return sign_qualifiers
 
     # utilities
     def search_alias(self, name, category):
