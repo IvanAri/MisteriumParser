@@ -25,6 +25,29 @@ PROCENT_EXPRESSION = re.compile("^[1-9][0-9]+%")
 def makeSpecialWordsExpressions(specialWord):
     return re.compile("%s[а-я]*" % specialWord, re.IGNORECASE)
 
+def make_pair_special_expression(word1, word2):
+    return re.compile("%s[а-я]+[,]*\s%s[а-я]+[.,!?]*" % (word1, word2), re.IGNORECASE)
+
+def make_triplet_special_expression(word1, word2, word3):
+    return re.compile("%s[а-я]+[,]*\s%s[а-я]+[,]*\s%s[а-я]+[.,!?]*" % (word1, word2, word3), re.IGNORECASE)
+
+def make_special_expression(special_string, container):
+    param_list = special_string.split(" ")
+    if len(param_list) == 1:
+        container += (
+            makeSpecialWordsExpressions(param_list[0]),
+        )
+    elif len(param_list) == 2:
+        container += (
+            make_pair_special_expression(param_list[0], param_list[1]),
+        )
+    elif len(param_list) == 3:
+        container += (
+            make_triplet_special_expression(param_list[0], param_list[1], param_list[2]),
+        )
+    else:
+        assert "Not supported parameter"
+
 for specialWord in SPECIAL_NAMES:
     SPECIAL_WORDS_EXPRESSIONS += (
         makeSpecialWordsExpressions(specialWord),

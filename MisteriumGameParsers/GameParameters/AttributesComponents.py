@@ -250,10 +250,9 @@ for category in SIGN_QUALIFIERS_CATEGORIES:
         )
 
 SIGN_QUALIFIERS_ALIASES = {
-    POSITIVE: "positive",
-    NEGATIVE: "negative",
+    POSITIVE: "+",
+    NEGATIVE: "-",
 }
-
 
 
 

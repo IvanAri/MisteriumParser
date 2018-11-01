@@ -1,34 +1,37 @@
+from MisteriumGameParsers.PrecompiledExpressions import makeSpecialWordsExpressions,\
+    make_pair_special_expression, make_triplet_special_expression, make_special_expression
+
 # ======================================================================================================================
 # Параметры. Базовая сущность, на которую аттрибут накидывает всякие уточнения и ограничения
 # ======================================================================================================================
 
 PHYSICAL_ATTACK = (
-    "атака",
+    "атак",
 )
 PHYSICAL_FORTITUDE = (
-    "физические силы",
+    "физическ си",
 )
 MENTAL_FORTITUDE = (
-    "ментальные силы",
+    "ментальн си",
 )
 MANA = (
-    "запас энергии",
+    "запа энерги",
 )
 
 SMALL_ENERGY_USAGE = (
-    "малая затрата",
+    "мал затра",
 )
 MEDIUM_ENERGY_USAGE = (
-    "средняя затрата",
+    "средн затра",
 )
 HIGH_ENERGY_USAGE = (
-    "высокая затрата",
+    "высок затра",
 )
 VERY_HIGH_ENERGY_USAGE = (
-    "высшая затрата",
+    "высш затра",
 )
 GLOBAL_ENERGY_USAGE = (
-    "глобальная затрата",
+    "глобальн затра",
 )
 
 PARAMETERS = (
@@ -42,6 +45,79 @@ PARAMETERS = (
     *VERY_HIGH_ENERGY_USAGE,
     *GLOBAL_ENERGY_USAGE,
 )
+
+PARAMETERS_EXPRESSIONS = ()
+
+for parameter in PARAMETERS:
+    param_list = parameter.split(" ")
+    if len(param_list) == 1:
+        PARAMETERS_EXPRESSIONS += (
+            makeSpecialWordsExpressions(param_list[0]),
+        )
+    elif len(param_list) == 2:
+        PARAMETERS_EXPRESSIONS += (
+            make_pair_special_expression(param_list[0], param_list[1]),
+        )
+    elif len(param_list) == 3:
+        PARAMETERS_EXPRESSIONS += (
+            make_triplet_special_expression(param_list[0], param_list[1], param_list[2]),
+        )
+    else:
+        assert "Not supported parameter"
+
+PARAMETERS_CATEGORIES = (
+    PHYSICAL_ATTACK,
+    PHYSICAL_FORTITUDE,
+    MENTAL_FORTITUDE,
+    MANA,
+    SMALL_ENERGY_USAGE,
+    MEDIUM_ENERGY_USAGE,
+    HIGH_ENERGY_USAGE,
+    VERY_HIGH_ENERGY_USAGE,
+    GLOBAL_ENERGY_USAGE,
+)
+
+PARAMETERS_CATEGORIES_EXPRESSIONS = {
+    PHYSICAL_ATTACK: (),
+    PHYSICAL_FORTITUDE: (),
+    MENTAL_FORTITUDE: (),
+    MANA: (),
+    SMALL_ENERGY_USAGE: (),
+    MEDIUM_ENERGY_USAGE: (),
+    HIGH_ENERGY_USAGE: (),
+    VERY_HIGH_ENERGY_USAGE: (),
+    GLOBAL_ENERGY_USAGE: (),
+}
+
+for category in PARAMETERS_CATEGORIES_EXPRESSIONS:
+    for parameter in category:
+        param_list = parameter.split(" ")
+        if len(param_list) == 1:
+            PARAMETERS_CATEGORIES_EXPRESSIONS[category] += (
+                makeSpecialWordsExpressions(param_list[0]),
+            )
+        elif len(param_list) == 2:
+            PARAMETERS_CATEGORIES_EXPRESSIONS[category] += (
+                make_pair_special_expression(param_list[0], param_list[1]),
+            )
+        elif len(param_list) == 3:
+            PARAMETERS_CATEGORIES_EXPRESSIONS[category] += (
+                make_triplet_special_expression(param_list[0], param_list[1], param_list[2]),
+            )
+        else:
+            assert "Not supported parameter"
+
+PARAMETERS_ALIASES = {
+    PHYSICAL_ATTACK: "physical attack",
+    PHYSICAL_FORTITUDE: "physical fortitude",
+    MENTAL_FORTITUDE: "mental fortitude",
+    MANA: "mana",
+    SMALL_ENERGY_USAGE: "small energy usage",
+    MEDIUM_ENERGY_USAGE: "medium energy usage",
+    HIGH_ENERGY_USAGE: "high energy usage",
+    VERY_HIGH_ENERGY_USAGE: "very high energy usage",
+    GLOBAL_ENERGY_USAGE: "global energy usage",
+}
 
 # ======================================================================================================================
 # Специализаторы параметра. Уточнения, к какой именно части параметра относится значение аттрибута
@@ -65,5 +141,5 @@ PARAMETERS_MODIFIERS = {
         SPEED_MODIFIER,
         STRENGTH_MODIFIER,
     ),
-
 }
+

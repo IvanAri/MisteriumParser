@@ -1,4 +1,5 @@
 from MisteriumGameParsers.GameParameters import AttributesComponents
+from MisteriumGameParsers.GameParameters import Parameters
 from MisteriumGameParsers.DataStructures.Utilities import ATTRIBUTE
 
 # TODO: i_belekhov перенеси это в AttributesComponents
@@ -7,11 +8,13 @@ GAME_ACTIONS = "game_actions"
 GAME_ACTIONS_MODIFIERS = "game_actions_modifiers"
 GAME_ACTIONS_IMPACTS = "game_actions_impact_modifiers"
 SIGN_QUALIFIERS = "sign_qualifiers"
+PARAMETERS = "parameters"
 EXPRESSIONS_BY_CATEGORIES = {
     GAME_ACTIONS: AttributesComponents.GAME_ACTIONS_CATEGORIES_EXPRESSIONS,
     GAME_ACTIONS_MODIFIERS: AttributesComponents.GAME_ACTIONS_MODIFIERS_CATEGORIES_EXPRESSIONS,
     GAME_ACTIONS_IMPACTS: AttributesComponents.GAME_ACTIONS_IMPACTS_CATEGORIES_EXPRESSIONS,
     SIGN_QUALIFIERS: AttributesComponents.SIGN_QUALIFIERS_CATEGORIES_EXPRESSIONS,
+    PARAMETERS: Parameters.PARAMETERS_CATEGORIES_EXPRESSIONS,
 }
 
 ALIASES_BY_CATEGORIES = {
@@ -19,6 +22,7 @@ ALIASES_BY_CATEGORIES = {
     GAME_ACTIONS_MODIFIERS: AttributesComponents.GAME_ACTIONS_MODIFIERS_ALIASES,
     GAME_ACTIONS_IMPACTS: AttributesComponents.GAME_ACTIONS_IMPACTS_ALIASES,
     SIGN_QUALIFIERS: AttributesComponents.SIGN_QUALIFIERS_ALIASES,
+    PARAMETERS: Parameters.PARAMETERS_ALIASES,
 }
 
 class AttributeParser:
@@ -40,10 +44,12 @@ class AttributeParser:
         game_actions_modifiers = self.find_game_action_modifiers()
         game_actions_impacts = self.find_game_action_impacts()
         sign_qualifiers = self.find_parameters_sign()
+        parameters = self.find_parameter()
         print('Game actions: ', game_actions)
         print('Game actions modifiers: ', game_actions_modifiers)
         print('Game actions impacts: ', game_actions_impacts)
         print('Sign qualifiers: ', sign_qualifiers)
+        print('Parameters: ', parameters)
         print("!!! Закончили парсить аттрибутную строку !!!")
         pass
 
@@ -83,6 +89,15 @@ class AttributeParser:
                 sign_qualifier = self.search_alias(res.group(), SIGN_QUALIFIERS)
                 sign_qualifiers.append(sign_qualifier)
         return sign_qualifiers
+
+    def find_parameter(self):
+        parameters = []
+        for expr in Parameters.PARAMETERS_EXPRESSIONS:
+            res = expr.search(self.__attribute_string)
+            if res:
+                parameter = self.search_alias(res.group(), PARAMETERS)
+                parameters.append(parameter)
+        return parameters
 
     # utilities
     def search_alias(self, name, category):
