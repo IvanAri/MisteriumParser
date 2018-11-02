@@ -9,12 +9,14 @@ GAME_ACTIONS_MODIFIERS = "game_actions_modifiers"
 GAME_ACTIONS_IMPACTS = "game_actions_impact_modifiers"
 SIGN_QUALIFIERS = "sign_qualifiers"
 PARAMETERS = "parameters"
+PARAMETERS_MODIFIERS = "parameters modifiers"
 EXPRESSIONS_BY_CATEGORIES = {
     GAME_ACTIONS: AttributesComponents.GAME_ACTIONS_CATEGORIES_EXPRESSIONS,
     GAME_ACTIONS_MODIFIERS: AttributesComponents.GAME_ACTIONS_MODIFIERS_CATEGORIES_EXPRESSIONS,
     GAME_ACTIONS_IMPACTS: AttributesComponents.GAME_ACTIONS_IMPACTS_CATEGORIES_EXPRESSIONS,
     SIGN_QUALIFIERS: AttributesComponents.SIGN_QUALIFIERS_CATEGORIES_EXPRESSIONS,
     PARAMETERS: Parameters.PARAMETERS_CATEGORIES_EXPRESSIONS,
+    PARAMETERS_MODIFIERS: Parameters.PARAMETERS_MODIFIERS_CATEGORIES_EXPRESSIONS,
 }
 
 ALIASES_BY_CATEGORIES = {
@@ -23,6 +25,7 @@ ALIASES_BY_CATEGORIES = {
     GAME_ACTIONS_IMPACTS: AttributesComponents.GAME_ACTIONS_IMPACTS_ALIASES,
     SIGN_QUALIFIERS: AttributesComponents.SIGN_QUALIFIERS_ALIASES,
     PARAMETERS: Parameters.PARAMETERS_ALIASES,
+    PARAMETERS_MODIFIERS: Parameters.PARAMETERS_MODIFIERS_ALIASES,
 }
 
 class AttributeParser:
@@ -45,11 +48,15 @@ class AttributeParser:
         game_actions_impacts = self.find_game_action_impacts()
         sign_qualifiers = self.find_parameters_sign()
         parameters = self.find_parameter()
+        parameters_modifiers = self.find_parameter_modifier()
+        values = self.find_value()
         print('Game actions: ', game_actions)
         print('Game actions modifiers: ', game_actions_modifiers)
         print('Game actions impacts: ', game_actions_impacts)
         print('Sign qualifiers: ', sign_qualifiers)
         print('Parameters: ', parameters)
+        print('Parameters modifiers: ', parameters_modifiers)
+        print('Values: ', values)
         print("!!! Закончили парсить аттрибутную строку !!!")
         pass
 
@@ -98,6 +105,19 @@ class AttributeParser:
                 parameter = self.search_alias(res.group(), PARAMETERS)
                 parameters.append(parameter)
         return parameters
+
+    def find_parameter_modifier(self):
+        parameters_modifiers = []
+        for expr in Parameters.PARAMETERS_MODIFIERS_EXPRESSIONS:
+            res = expr.search(self.__attribute_string)
+            if res:
+                parameter_modifier = self.search_alias(res.group(), PARAMETERS_MODIFIERS)
+                parameters_modifiers.append(parameter_modifier)
+        return parameters_modifiers
+
+    def find_value(self):
+        values = AttributesComponents.VALUE_EXPRESSION.findall(self.__attribute_string)
+        return values
 
     # utilities
     def search_alias(self, name, category):

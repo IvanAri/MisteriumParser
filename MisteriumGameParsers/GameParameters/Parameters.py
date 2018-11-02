@@ -121,19 +121,28 @@ PARAMETERS_ALIASES = {
 
 # ======================================================================================================================
 # Специализаторы параметра. Уточнения, к какой именно части параметра относится значение аттрибута
+# Подразумевается, что модификатор параметра описывается одним словом, но это можно изменить.
 # ======================================================================================================================
 
-SPEED_MODIFIER = "скорость"
-STRENGTH_MODIFIER = "сила"
+SPEED_MODIFIER = (
+    "скорост",
+                  )
+STRENGTH_MODIFIER = (
+    "сил",
+)
 
-MAX = "максимальный"
-CURRENT = "текущий"
+MAX = (
+    "максимал",
+)
+CURRENT = (
+    "текущ",
+)
 
 ALL_MODIFIERS = (
-    SPEED_MODIFIER,
-    STRENGTH_MODIFIER,
-    MAX,
-    CURRENT,
+    *SPEED_MODIFIER,
+    *STRENGTH_MODIFIER,
+    *MAX,
+    *CURRENT,
 )
 
 PARAMETERS_MODIFIERS = {
@@ -141,5 +150,39 @@ PARAMETERS_MODIFIERS = {
         SPEED_MODIFIER,
         STRENGTH_MODIFIER,
     ),
+}
+
+PARAMETERS_MODIFIERS_EXPRESSIONS = ()
+
+for parameter_modifier in ALL_MODIFIERS:
+    PARAMETERS_MODIFIERS_EXPRESSIONS += (
+        makeSpecialWordsExpressions(parameter_modifier),
+    )
+
+PARAMETERS_MODIFIERS_CATEGORIES = (
+    SPEED_MODIFIER,
+    STRENGTH_MODIFIER,
+    MAX,
+    CURRENT,
+)
+
+PARAMETERS_MODIFIERS_CATEGORIES_EXPRESSIONS = {
+    SPEED_MODIFIER: (),
+    STRENGTH_MODIFIER: (),
+    MAX: (),
+    CURRENT: (),
+}
+
+for category in PARAMETERS_MODIFIERS_CATEGORIES:
+    for parameter_modifier in category:
+        PARAMETERS_MODIFIERS_CATEGORIES_EXPRESSIONS[category] += (
+            makeSpecialWordsExpressions(parameter_modifier),
+        )
+
+PARAMETERS_MODIFIERS_ALIASES = {
+    SPEED_MODIFIER: "speed modifier",
+    STRENGTH_MODIFIER: "strength modifier",
+    MAX: "max",
+    CURRENT: "current",
 }
 
