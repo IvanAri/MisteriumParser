@@ -223,14 +223,15 @@ class ATTRIBUTE:
     def __init__(self):
         self.__name = ""
         self.__game_action = ""
-        self.__impact = ""
-        self.__parameter = None # should be a PARAMETER obj
-        self.__specifier = "" # some specificator name
+        self.__game_action_modifier = ""
+        self.__game_action_impact = ""
+        self.__parameter = "" # should be a PARAMETER string
+        self.__parameter_specifier = "" # some specifier name
         self.__basic = False
         self.__additive = False
         self.__multiplicative = False
         self.__sign = 1  # 1 or -1
-        self.__value = 0
+        self.__parameter_value = 0
 
     # Setters and getters
 
@@ -245,6 +246,22 @@ class ATTRIBUTE:
     @game_action.setter
     def game_action(self, value):
         self.__game_action = value
+
+    @property
+    def game_action_modifier(self):
+        return self.__game_action_modifier
+
+    @game_action_modifier.setter
+    def game_action_modifier(self, value):
+        self.__game_action_modifier = value
+
+    @property
+    def game_action_impact(self):
+        return self.__game_action_impact
+
+    @game_action_impact.setter
+    def game_action_impact(self, value):
+        self.__game_action_impact = value
 
     @property
     def is_additive(self):
@@ -263,12 +280,28 @@ class ATTRIBUTE:
         self.__multiplicative = value
 
     @property
-    def value(self):
-        return self.__additive
+    def parameter(self):
+        return self.__parameter
 
-    @value.setter
-    def value(self, attributeValue):
-        self.__additive = attributeValue
+    @parameter.setter
+    def parameter(self, value):
+        self.__parameter = value
+
+    @property
+    def parameter_specifier(self):
+        return self.__parameter_specifier
+
+    @parameter_specifier.setter
+    def parameter_specifier(self, value):
+        self.__parameter_specifier = value
+
+    @property
+    def parameter_value(self):
+        return self.__parameter_value
+
+    @parameter_value.setter
+    def parameter_value(self, value):
+        self.__parameter_value = value
         
     @property
     def sign(self):
@@ -281,12 +314,18 @@ class ATTRIBUTE:
     # dict converter
     def objToDict(self):
         return {
-            "type": self.type,
+            "type": self.name,
             "is_additive": self.is_additive,  # True or False depending on mechanic
             "is_multiplicative": self.is_multiplicative,
+            "is_basic": self.__basic,
             # True or False depending on mechanic structure.
             # Additive and multiplicative can't be True together
+            "game_action": self.game_action,
+            "game_action_modifier": self.game_action_modifier,
+            "game_action_impact": self.game_action_impact,
+            "parameter": self.parameter,
+            "parameter_specifier": self.parameter_specifier,
             "sign": self.sign, # sign for further calculations, can be 1 or -1
-            "value": self.value,  # positive or negative int value
+            "parameter_value": self.parameter_value,  # positive or negative int value
         }
 

@@ -50,6 +50,7 @@ class AttributeParser:
         parameters = self.find_parameter()
         parameters_modifiers = self.find_parameter_modifier()
         values = self.find_value()
+        '''
         print('Game actions: ', game_actions)
         print('Game actions modifiers: ', game_actions_modifiers)
         print('Game actions impacts: ', game_actions_impacts)
@@ -58,7 +59,21 @@ class AttributeParser:
         print('Parameters modifiers: ', parameters_modifiers)
         print('Values: ', values)
         print("!!! Закончили парсить аттрибутную строку !!!")
-        pass
+        '''
+        if len(parameters) == 1 and len(values) == 1:
+            return self.make_attribute(
+                game_actions= game_actions,
+                game_actions_modifiers= game_actions_modifiers,
+                game_actions_impacts= game_actions_impacts,
+                sign_qualifiers= sign_qualifiers,
+                parameters= parameters[0],
+                parameters_specifiers= parameters_modifiers,
+                values= values[0],
+            )
+        else:
+            return None
+
+    # Внутренние компоненты парсера
 
     # TODO: объединить методы в один, скармливать туда stage'ы
     def find_game_action(self):
@@ -120,6 +135,35 @@ class AttributeParser:
         return values
 
     # utilities
+    def make_attribute(self, **kwargs):
+        attribute = ATTRIBUTE()
+        game_actions = kwargs['game_actions']
+        game_actions_modifiers = kwargs['game_actions_modifiers']
+        game_actions_impacts = kwargs['game_actions_impacts']
+        sign_qualifiers = kwargs['sign_qualifiers']
+        parameter = kwargs['parameters']
+        parameter_specifier = kwargs['parameters_specifiers']
+        value = kwargs['values']
+
+        attribute.game_action = game_actions
+        attribute.game_action_modifier = game_actions_modifiers
+        attribute.game_action_impact = game_actions_impacts
+        if sign_qualifiers[0] in AttributesComponents.NEGATIVE:
+            sign = '-'
+        elif sign_qualifiers[0] in AttributesComponents.POSITIVE:
+            sign = '+'
+        else:
+            sign = '+'
+
+        attribute.sign = sign
+        attribute.parameter = parameter
+        attribute.parameter_specifier = parameter_specifier
+        attribute.parameter_value = value
+        attribute.is_additive = False
+        attribute.is_multiplicative = False
+        return attribute
+
+
     def search_alias(self, name, category):
         expr_category = EXPRESSIONS_BY_CATEGORIES[category]
         for type in expr_category:

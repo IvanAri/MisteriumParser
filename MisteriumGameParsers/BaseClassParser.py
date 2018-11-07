@@ -7,6 +7,7 @@ from MisteriumGameParsers.UtilityParsers import get_characteristic_from_line
 from MisteriumGameParsers.DataStructures.ClassDataStructure import BASIC_CLASS
 from MisteriumGameParsers.DataStructures.Utilities import PREREQUISITES
 from MisteriumGameParsers.GameParameters.Characteristics import RUS_TO_ENGL_CHARACTERISCTICS
+from MisteriumGameParsers.AttributeParser import AttributeParser
 
 
 # TODO: i_belekhov remake this class to work with strings and post content itself and not a feed from parser
@@ -178,13 +179,11 @@ class BaseClassParser:
         expr = CLASS_ATTRIBUTES_START_EXPRESSION
         for idx, line in enumerate(self.__post[self.__currentLineIndex::]):
             if expr.match(line):
-                # TODO: оставились на обработке аттрибутов, какие-то из них сможем запарсить сходу, какие-то нет.
-                #  Очень много специфичных формулировок
                 self.__stage = BaseClassParser.CLASS_ATTRIBUTES_FOUND
                 self.__currentLineIndex = self.__post.index(line)
 
                 ability_start_expression = CLASS_ABILITIES_START_EXPRESSION
-                for index, search_line in enumerate(self.__post[self.__currentLineIndex::]):
+                for index, search_line in enumerate(self.__post[self.__currentLineIndex+1::]):
                     if ability_start_expression.match(search_line):
                         self.__currentLineIndex = self.__post.index(search_line)
                         break
@@ -196,11 +195,13 @@ class BaseClassParser:
         if not isinstance(buffer, list):
             assert "class_attributes_handler should be provided with list of strings"
 
+        parser = AttributeParser()
+
         for idx, line in enumerate(buffer):
-            for expr in PRQ_EXPRESSIONS:
-                if expr.match(line):
-                    # TODO: здесь начинается портянка из вариантов, которые потом как-нибудь надо разбить
-                    pass
+                # TODO: здесь начинается портянка из вариантов, которые потом как-нибудь надо разбить
+                attr = parser.parse_attribute_string(line)
+                if attr:
+                    self.__gameClass.passive_attributes.append(attr)
                 else:
                     self.__gameClass.string_attributes.append(line)
 
@@ -208,6 +209,7 @@ class BaseClassParser:
         self.__buffer.clear()
 
     def abilities_searcher(self):
+
         pass
 
     def class_verifier(self):
