@@ -29,10 +29,13 @@ def makeSpecialWordsExpressions(specialWord):
     return re.compile("%s[а-я]*" % specialWord, re.IGNORECASE)
 
 def make_pair_special_expression(word1, word2):
-    return re.compile("%s[а-я]+[,]*\s%s[а-я]+[.,!?]*" % (word1, word2), re.IGNORECASE)
+    return re.compile("%s[а-я]*[,]*\s%s[а-я]*[.,!?]*" % (word1, word2), re.IGNORECASE)
 
 def make_triplet_special_expression(word1, word2, word3):
-    return re.compile("%s[а-я]+[,]*\s%s[а-я]+[,]*\s%s[а-я]+[.,!?]*" % (word1, word2, word3), re.IGNORECASE)
+    return re.compile("%s[а-я]*[,]*\s%s[а-я]*[,]*\s%s[а-я]*[.,!?]*" % (word1, word2, word3), re.IGNORECASE)
+
+def make_quadruple_special_expression(word1, word2, word3, word4):
+    return re.compile("%s[а-я]*[,]*\s%s[а-я]*[,]*\s%s[а-я]*[,]*\s%s[а-я]*[.,!?]*" % (word1, word2, word3, word4), re.IGNORECASE)
 
 def make_special_expression(special_string):
     special_words_list = special_string.split(" ")
@@ -43,6 +46,8 @@ def make_special_expression(special_string):
         result = make_pair_special_expression(special_words_list[0], special_words_list[1])
     elif len(special_words_list) == 3:
         result = make_triplet_special_expression(special_words_list[0], special_words_list[1], special_words_list[2])
+    elif len(special_words_list) == 4:
+        result = make_quadruple_special_expression(special_words_list[0], special_words_list[1], special_words_list[2], special_words_list[3])
     else:
         assert "Not supported parameter"
     return result
@@ -120,3 +125,9 @@ for abilitiy_name in NOT_EXACT_ABILITY_NAMES:
     NOT_EXACT_ABILITIES_EXPRESSIONS += (
         make_special_expression(abilitiy_name),
     )
+
+# cost/level expressions
+
+LEVEL_AND_COST_EXPRESSION = re.compile("[1-9][0-9]*\sурове[а-я]*\s[-]\s[1-9][0-9]*\sбалл[а-я]*\sопыт[а-я]*", re.IGNORECASE)
+LEVEL_EXPRESSION = re.compile("[1-9][0-9]*\sурове[а-я]*", re.IGNORECASE)
+EXPERIENCE_COST_EXPR = re.compile("[1-9][0-9]*\sбалл[а-я]*\sопыт[а-я]*", re.IGNORECASE)

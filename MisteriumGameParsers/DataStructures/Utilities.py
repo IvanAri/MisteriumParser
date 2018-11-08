@@ -144,17 +144,23 @@ class PREREQUISITES:
         }
 
 # TODO: make a cost object in the future
+
+class COST_SPECIAL_WORDS:
+    EXPERIENCE = "experience"
+    HONOUR = "honour"
+    LOYALTY = "loyalty"
+
 class LEVEL:
 
     def __init__(self):
         self.__level = 0
-        self.__attributes = {} # dict of ATTRIBUTE objects
+        self.__attributes = [] # dict of ATTRIBUTE objects
         self.__mechanic = "" # mechanic string
         self.__prerequisites = None # should be a PREREQUISITES object
         self.__cost = {
-            "experience": 0,
-            "honour": 0,
-            "loyalty": 0,
+            COST_SPECIAL_WORDS.EXPERIENCE: 0,
+            COST_SPECIAL_WORDS.HONOUR: 0,
+            COST_SPECIAL_WORDS.LOYALTY: 0,
         } # dict of costs
 
     # Setters and getters
@@ -171,13 +177,6 @@ class LEVEL:
     def attributes(self):
         return self.__attributes
 
-    @attributes.setter
-    def attributes(self, attribute):
-        if isinstance(attribute, ATTRIBUTE):
-            self.__attributes[attribute.name] = attribute
-        else:
-            assert "Something went wrong %s is not a valid attribute" % attribute
-
     @property
     def mechanic(self):
         return self.__mechanic
@@ -191,7 +190,7 @@ class LEVEL:
 
     @property
     def prerequisites(self):
-        return self.__prerequisites.objToDict()
+        return self.__prerequisites
 
     @prerequisites.setter
     def prerequisites(self, prerequisitesObj):
@@ -212,9 +211,9 @@ class LEVEL:
         return {
             "level": self.level, # int with actual level number
             "cost": self.cost, # dict with costs in exp and other types of game currencies
-            "attributes": self.attributes, # list of attributes objects that can be converted to game characteristics
+            "attributes": [attr.objToDict() for attr in self.__attributes], # list of attributes objects that can be converted to game characteristics
             "mechanic": self.mechanic, # general mechanic description, if can't be parsed into bonuses
-            "prerequisites": self.prerequisites, # PREREQUISITES dict or obj that can be converted to dict
+            "prerequisites": self.prerequisites.objToDict(), # PREREQUISITES dict or obj that can be converted to dict
         }
 
 # ! ! ! NOT any attribute can be described as an object, that's why sometimes we will use game-description strings
