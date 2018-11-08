@@ -11,6 +11,11 @@ ABILITY = {
     "levels": [], #list of LEVEL dicts or objs
 }
 
+class ABILITIES_SPECIAL_WORDS:
+    # abilities types
+    PASSIVE = "passive"
+    ACTIVE = "active"
+
 class ABILITY_DESCRIPTION:
     def __init__(self):
         self.__name = "" # just some string

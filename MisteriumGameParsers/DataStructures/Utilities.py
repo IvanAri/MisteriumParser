@@ -174,7 +174,7 @@ class LEVEL:
     @attributes.setter
     def attributes(self, attribute):
         if isinstance(attribute, ATTRIBUTE):
-            self.__attributes[attribute.type] = attribute
+            self.__attributes[attribute.name] = attribute
         else:
             assert "Something went wrong %s is not a valid attribute" % attribute
 

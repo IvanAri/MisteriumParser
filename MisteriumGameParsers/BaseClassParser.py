@@ -1,11 +1,14 @@
 from MisteriumGameParsers.PrecompiledExpressions import CLASS_NAME_EXPRESSIONS, PRQ_EXPRESSIONS, DESCRIPTION_START_EXPRESSION,\
-                                                CLASS_ATTRIBUTES_START_EXPRESSION, CLASS_ABILITIES_START_EXPRESSION
+                                                CLASS_ATTRIBUTES_START_EXPRESSION, CLASS_ABILITIES_START_EXPRESSION,\
+                                                NOT_EXACT_ABILITIES_EXPRESSIONS, TECHNICAL_WORDS_EXPRESSIONS
 from MisteriumGameParsers.PrecompiledExpressions import PRQ_LEVEL_EXPRESSION, PRQ_GAMEPLAY_EXPRESSION,\
                                                         PRQ_CLASS_EXPRESSION, PRQ_CHARACTERISCTIC_EXPRESSIONS,\
                                                         PRQ_ABILITY_EXPRESSIONS, PRQ_GENDER_EXPRESSION
+from MisteriumGameParsers.PrecompiledExpressions import makeSpecialWordsExpressions
 from MisteriumGameParsers.UtilityParsers import get_characteristic_from_line
 from MisteriumGameParsers.DataStructures.ClassDataStructure import BASIC_CLASS
-from MisteriumGameParsers.DataStructures.Utilities import PREREQUISITES
+from MisteriumGameParsers.DataStructures.Utilities import PREREQUISITES, LEVEL
+from MisteriumGameParsers.DataStructures.AbilityDataStructure import GENERAL_ABILITY, ABILITIES_SPECIAL_WORDS
 from MisteriumGameParsers.GameParameters.Characteristics import RUS_TO_ENGL_CHARACTERISCTICS
 from MisteriumGameParsers.AttributeParser import AttributeParser
 
@@ -198,7 +201,6 @@ class BaseClassParser:
         parser = AttributeParser()
 
         for idx, line in enumerate(buffer):
-                # TODO: здесь начинается портянка из вариантов, которые потом как-нибудь надо разбить
                 attr = parser.parse_attribute_string(line)
                 if attr:
                     self.__gameClass.passive_attributes.append(attr)
@@ -209,7 +211,61 @@ class BaseClassParser:
         self.__buffer.clear()
 
     def abilities_searcher(self):
+        expr = CLASS_ABILITIES_START_EXPRESSION
+        for idx, line in enumerate(self.__post[self.__currentLineIndex::]):
+            if expr.match(line):
+                self.__stage = BaseClassParser.ABILITIES_FOUND
+                self.__currentLineIndex = self.__post.index(line)
 
+                for index, search_line in enumerate(self.__post[self.__currentLineIndex+1::]):
+                    self.__buffer.append(search_line)
+                self.class_attributes_handler(self.__buffer)
+                return
+
+    def abilities_handler(self, buffer):
+        if not isinstance(buffer, list):
+            assert "abilities_handler should be provided with list of strings"
+
+        current_ability_start_idx = 0
+        next_ability_start_idx = 1
+        inner_buffer = []
+        for idx, line in enumerate(buffer):
+            if any(expr.match(line) for expr in NOT_EXACT_ABILITIES_EXPRESSIONS):
+                current_ability_start_idx = idx
+                next_ability_start_idx = current_ability_start_idx+1
+                inner_buffer.append(line) # appending current ability name line
+                for idx, line in buffer[current_ability_start_idx+1::]:
+                    if any(expr.match(line) for expr in NOT_EXACT_ABILITIES_EXPRESSIONS):
+                        break
+                    inner_buffer.append(line)
+                    next_ability_start_idx+=1
+                self.__single_ability_handler(inner_buffer)
+                inner_buffer.clear()
+
+
+
+        pass
+
+    def __single_ability_handler(self, buffer):
+        if not isinstance(buffer, list):
+            assert "single_ability_handler should be provided with list of strings"
+
+        parser = AttributeParser()
+        ability = None
+        for idx, line in enumerate(buffer):
+            if any(expr.match(line) for expr in NOT_EXACT_ABILITIES_EXPRESSIONS):
+                ability = GENERAL_ABILITY()
+                ability.name = line
+            if any(expr.match(line) for expr in TECHNICAL_WORDS_EXPRESSIONS):
+                if ability:
+                    active_expr = makeSpecialWordsExpressions("активн")
+                    passive_expr = makeSpecialWordsExpressions("пассивн")
+                    if active_expr.match(line.split(" ")[0]):
+                        ability.type = ABILITIES_SPECIAL_WORDS.ACTIVE
+                    elif passive_expr.match(line.split(" ")[0]):
+                        ability.type = ABILITIES_SPECIAL_WORDS.PASSIVE
+
+    def __level_parser(self, line):
         pass
 
     def class_verifier(self):

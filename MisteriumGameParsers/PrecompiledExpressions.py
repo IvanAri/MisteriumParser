@@ -1,8 +1,10 @@
 import re
-from MisteriumGameParsers.SpecialWordsConstants import SPECIAL_NAMES, MAIN_CLASSES_NAMES, CHARACTERISTICS
+from MisteriumGameParsers.SpecialWordsConstants import SPECIAL_NAMES_FOR_BASIC_PARSER, MAIN_CLASSES_NAMES, CHARACTERISTICS
 from MisteriumGameParsers.SpecialWordsConstants import PREREQUISITES_GAMEPLAY, PREREQUISITES_CLASS, PREREQUISITES_LEVEL,\
                                                         PREREQUISITES_LEVEL, PREREQUISITES_ABILITIES,\
-                                                        PREREQUISITES_CHARACTERISTICS, PREREQUISITES_WORDS
+                                                        PREREQUISITES_CHARACTERISTICS, PREREQUISITES_WORDS,\
+                                                        NOT_EXACT_ABILITY_NAMES
+from MisteriumGameParsers.SpecialWordsConstants import TECHNICAL_SINGLE_WORDS
 
 
 EXPERIENCE_EXPR = re.compile('балл[а-я]+\sопыт[а-я]+', re.IGNORECASE)
@@ -16,6 +18,7 @@ class WORD_COUNT_EXPRESSIONS:
 FINISH_EXPRESSIONS = ()
 SPECIAL_WORDS_EXPRESSIONS = ()
 CHARACTERISTIC_EXPRESSIONS = ()
+TECHNICAL_WORDS_EXPRESSIONS = ()
 
 LEVEL_EXP_EXPRESSION = re.compile('[1-9]+\sуровень\s[-]\s[0-9]+\sбал[а-я]+\sопы[а-я]+', re.IGNORECASE)
 ACTIVE_ABILITY_EXPR = re.compile('активн[а-я]+\s[-]перезаряд[а-я]+\s[1-9]+]', re.IGNORECASE)
@@ -31,30 +34,31 @@ def make_pair_special_expression(word1, word2):
 def make_triplet_special_expression(word1, word2, word3):
     return re.compile("%s[а-я]+[,]*\s%s[а-я]+[,]*\s%s[а-я]+[.,!?]*" % (word1, word2, word3), re.IGNORECASE)
 
-def make_special_expression(special_string, container):
-    param_list = special_string.split(" ")
-    if len(param_list) == 1:
-        container += (
-            makeSpecialWordsExpressions(param_list[0]),
-        )
-    elif len(param_list) == 2:
-        container += (
-            make_pair_special_expression(param_list[0], param_list[1]),
-        )
-    elif len(param_list) == 3:
-        container += (
-            make_triplet_special_expression(param_list[0], param_list[1], param_list[2]),
-        )
+def make_special_expression(special_string):
+    special_words_list = special_string.split(" ")
+    result = None
+    if len(special_words_list) == 1:
+        result = makeSpecialWordsExpressions(special_words_list[0])
+    elif len(special_words_list) == 2:
+        result = make_pair_special_expression(special_words_list[0], special_words_list[1])
+    elif len(special_words_list) == 3:
+        result = make_triplet_special_expression(special_words_list[0], special_words_list[1], special_words_list[2])
     else:
         assert "Not supported parameter"
+    return result
 
-for specialWord in SPECIAL_NAMES:
+for specialWord in SPECIAL_NAMES_FOR_BASIC_PARSER:
     SPECIAL_WORDS_EXPRESSIONS += (
         makeSpecialWordsExpressions(specialWord),
     )
 
 for special_word in CHARACTERISTICS:
     CHARACTERISTIC_EXPRESSIONS += (
+        makeSpecialWordsExpressions(special_word),
+    )
+
+for special_word in TECHNICAL_SINGLE_WORDS:
+    TECHNICAL_WORDS_EXPRESSIONS += (
         makeSpecialWordsExpressions(special_word),
     )
 
@@ -108,3 +112,11 @@ CLASS_ABILITIES_START_EXPRESSION = re.compile("доступ[а-я]+\sнавы[а
 
 # attribute expressions
 
+# abilities expressions
+
+NOT_EXACT_ABILITIES_EXPRESSIONS = ()
+
+for abilitiy_name in NOT_EXACT_ABILITY_NAMES:
+    NOT_EXACT_ABILITIES_EXPRESSIONS += (
+        make_special_expression(abilitiy_name),
+    )
