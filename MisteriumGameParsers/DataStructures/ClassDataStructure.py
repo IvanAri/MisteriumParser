@@ -81,8 +81,8 @@ class BASIC_CLASS:
             "string_attributes": self.__string_attributes,
             "passive_attributes": [attr.objToDict() for attr in self.__passive_attributes],  # should be list of ATTRIBUTE objs
             "abilities": {
-                "passives": [],  # should be list of ability objects, in future - dicts
-                "actives": [],  # should be list of ability objects, in future - dicts
+                "passives": [ability.objToDict() for ability in self.passive_abilities],  # should be list of ABILITY dicts
+                "actives": [ability.objToDict() for ability in self.active_abilities],  # should be list of ABILITY dicts
             }
         }
 

@@ -24,6 +24,7 @@ LEVEL_EXP_EXPRESSION = re.compile('[1-9]+\sуровень\s[-]\s[0-9]+\sбал[�
 ACTIVE_ABILITY_EXPR = re.compile('активн[а-я]+\s[-]перезаряд[а-я]+\s[1-9]+]', re.IGNORECASE)
 SENTENCE_EXPRESSION = re.compile("([а-я]+[()!\s,;]*)*[.!?]", re.IGNORECASE)
 PROCENT_EXPRESSION = re.compile("^[1-9][0-9]+%")
+WIDE_PROCENT_EXPRESSION = re.compile("[+\-][0-9]+%")
 
 def makeSpecialWordsExpressions(specialWord):
     return re.compile("%s[а-я]*" % specialWord, re.IGNORECASE)
@@ -89,7 +90,7 @@ for specialWord in MAIN_CLASSES_NAMES:
 PRQ_GAMEPLAY_EXPRESSION = re.compile("требуе[а-я]+\sотыгры[а-я]+", re.IGNORECASE)
 PRQ_LEVEL_EXPRESSION = re.compile("требуе[а-я]+\sуров[а-я]+", re.IGNORECASE)
 PRQ_CLASS_EXPRESSION = re.compile("требуе[а-я]+\sклас[а-я]+", re.IGNORECASE)
-PRQ_GENDER_EXPRESSION = re.compile("требуе[а-я]+\sпо[а-я]+", re.IGNORECASE)
+PRQ_GENDER_EXPRESSION = re.compile("требуе[а-я]+\sпол", re.IGNORECASE)
 PRQ_CHARACTERISCTIC_EXPRESSIONS = ()
 PRQ_ABILITY_EXPRESSIONS = ()
 
@@ -125,6 +126,16 @@ for abilitiy_name in NOT_EXACT_ABILITY_NAMES:
     NOT_EXACT_ABILITIES_EXPRESSIONS += (
         make_special_expression(abilitiy_name),
     )
+
+style_expr = make_special_expression("стил бо")
+active_expr = makeSpecialWordsExpressions("активн")
+passive_expr = makeSpecialWordsExpressions("пассивн")
+
+ABILITY_TYPE_EXPRESSIONS = (
+    style_expr,
+    active_expr,
+    passive_expr,
+)
 
 # cost/level expressions
 

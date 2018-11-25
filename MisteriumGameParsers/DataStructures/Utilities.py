@@ -213,7 +213,7 @@ class LEVEL:
             "cost": self.cost, # dict with costs in exp and other types of game currencies
             "attributes": [attr.objToDict() for attr in self.__attributes], # list of attributes objects that can be converted to game characteristics
             "mechanic": self.mechanic, # general mechanic description, if can't be parsed into bonuses
-            "prerequisites": self.prerequisites.objToDict(), # PREREQUISITES dict or obj that can be converted to dict
+            "prerequisites": self.prerequisites if self.prerequisites is not None else PREREQUISITES().objToDict(), # PREREQUISITES dict or obj that can be converted to dict
         }
 
 # ! ! ! NOT any attribute can be described as an object, that's why sometimes we will use game-description strings

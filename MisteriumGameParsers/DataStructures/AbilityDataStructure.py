@@ -15,6 +15,9 @@ class ABILITIES_SPECIAL_WORDS:
     # abilities types
     PASSIVE = "passive"
     ACTIVE = "active"
+    STYLE = "style"
+
+    PASSIVE_TYPES = (PASSIVE, STYLE)
 
 class ABILITY_DESCRIPTION:
     def __init__(self):
@@ -86,7 +89,7 @@ class GENERAL_ABILITY:
 
     @property
     def prerequisites(self):
-        return self.__prerequisites.objToDict()
+        return self.__prerequisites
 
     @prerequisites.setter
     def prerequisites(self, prerequisitesObj):
@@ -97,14 +100,7 @@ class GENERAL_ABILITY:
 
     @property
     def levels(self):
-        return [level.objToDict() for level in self.__levels]
-
-    @levels.setter
-    def levels(self, level):
-        if isinstance(level, LEVEL):
-            self.__levels.append(level)
-        else:
-            assert "Something went wrong %s is not a valid level" % level
+        return self.__levels
 
     # dict converter
     def objToDict(self):
@@ -113,6 +109,6 @@ class GENERAL_ABILITY:
             "type": self.type,
             "isUnique": self.isUnique,  # is ability unique or not
             "description": self.description,  # general ability description
-            "prerequisites": self.prerequisites,  # PREREQUISITES dict
-            "levels": [level.objToDict() for level in self.__levels],  # list of LEVEL dicts
+            "prerequisites": self.prerequisites if self.prerequisites is not None else PREREQUISITES().objToDict(),  # PREREQUISITES dict
+            "levels": dict((level.level, level.objToDict()) for level in self.__levels),  # dict of LEVEL dicts
         }

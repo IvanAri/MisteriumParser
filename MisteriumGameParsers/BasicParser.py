@@ -2,7 +2,7 @@ from collections import deque
 import json
 
 from MisteriumGameParsers.PrecompiledExpressions import EXPERIENCE_EXPR, FINISH_EXPRESSIONS, \
-    WORD_COUNT_EXPRESSIONS, SPECIAL_WORDS_EXPRESSIONS
+    WORD_COUNT_EXPRESSIONS, SPECIAL_WORDS_EXPRESSIONS, WIDE_PROCENT_EXPRESSION
 import copy
 
 # TODO: i_belekhov remake this class to work with strings and post content itself and not a feed from parser
@@ -45,9 +45,6 @@ class BasicParser:
             return
 
         isSomeLineProcessed = False
-        print("==== Processing segment ====")
-        # For debug
-        self.show_buffer()
 
         # Если мы смогли запроцессить хотя бы одну строку, значит буфер изменился.
         # Необходимо почистить и пустить процесс заново
@@ -56,10 +53,6 @@ class BasicParser:
                 isSomeLineProcessed = True
                 self.clean_buffer()
                 break
-
-        print("==== Stopped processing segment ====")
-        # For debug
-        self.show_buffer()
 
         # Первая строка после обработки всегда должна быть правильной, по идее. Не надо надеяться, надо делать по уму
         if not isSomeLineProcessed:
@@ -134,8 +127,9 @@ class BasicParser:
 
     # ========================= startsWith handlers ====================================================================
     def general_startswith_handler(self, line):
+        expr = WIDE_PROCENT_EXPRESSION
         for start in self.STARTSWITH:
-            if line.startswith(start):
+            if line.startswith(start) and not expr.match(line):
                 lineIndex = self.threeLineSegment.index(line)
                 if lineIndex > 0:
                     self.threeLineSegment[lineIndex - 1] += " " + line

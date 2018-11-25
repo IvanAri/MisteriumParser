@@ -2,11 +2,11 @@ from MisteriumGameParsers.PrecompiledExpressions import CLASS_NAME_EXPRESSIONS, 
                                                 CLASS_ATTRIBUTES_START_EXPRESSION, CLASS_ABILITIES_START_EXPRESSION,\
                                                 NOT_EXACT_ABILITIES_EXPRESSIONS, TECHNICAL_WORDS_EXPRESSIONS
 from MisteriumGameParsers.PrecompiledExpressions import LEVEL_AND_COST_EXPRESSION, LEVEL_EXPRESSION,\
-                                                        EXPERIENCE_COST_EXPR
+                                                        EXPERIENCE_COST_EXPR, ABILITY_TYPE_EXPRESSIONS
 from MisteriumGameParsers.PrecompiledExpressions import PRQ_LEVEL_EXPRESSION, PRQ_GAMEPLAY_EXPRESSION,\
                                                         PRQ_CLASS_EXPRESSION, PRQ_CHARACTERISCTIC_EXPRESSIONS,\
                                                         PRQ_ABILITY_EXPRESSIONS, PRQ_GENDER_EXPRESSION
-from MisteriumGameParsers.PrecompiledExpressions import makeSpecialWordsExpressions
+from MisteriumGameParsers.PrecompiledExpressions import makeSpecialWordsExpressions, make_special_expression
 from MisteriumGameParsers.UtilityParsers import get_characteristic_from_line
 from MisteriumGameParsers.DataStructures.ClassDataStructure import BASIC_CLASS
 from MisteriumGameParsers.DataStructures.Utilities import PREREQUISITES, LEVEL, COST_SPECIAL_WORDS
@@ -14,6 +14,8 @@ from MisteriumGameParsers.DataStructures.AbilityDataStructure import GENERAL_ABI
 from MisteriumGameParsers.GameParameters.Characteristics import RUS_TO_ENGL_CHARACTERISCTICS
 from MisteriumGameParsers.AttributeParser import AttributeParser
 
+import json
+import sys
 
 # TODO: i_belekhov remake this class to work with strings and post content itself and not a feed from parser
 # TODO: in the end we should have a data structure converted to JSon for further use
@@ -87,6 +89,13 @@ class BaseClassParser:
 
         self.__post = rawData # list of strings
         self.__stage = BaseClassParser.NEW_POST
+
+        name = self.__post[0]
+        print("XYI ! ! !", name)
+        if not any(expr.match(name) for expr in CLASS_NAME_EXPRESSIONS):
+            print("! ! ! THIS POST IS NOT A BASE CLASS POST ! ! !")
+            return
+
         self.extract_class()
 
         print("==== PROCESSING COMPLETE! ====")
@@ -228,46 +237,100 @@ class BaseClassParser:
         if not isinstance(buffer, list):
             assert "abilities_handler should be provided with list of strings"
 
-        parser = AttributeParser()
-        current_level = 0
+        inner_buffer = []
+        for idx, line in enumerate(buffer):
+            for expr in NOT_EXACT_ABILITIES_EXPRESSIONS:
+                res = expr.match(line)
+                if res and len(res.group()) == len(line):
+                    current_ability_index = buffer.index(line)
 
-        '''
-        ability = None
-        print("ЗАТЫК ЗДЕСЬ!!!", buffer)
-        for line in buffer:
-            if any(expr.match(line) for expr in NOT_EXACT_ABILITIES_EXPRESSIONS):
-                if ability:
-                    type = ability.type
-                    if type == ABILITIES_SPECIAL_WORDS.ACTIVE:
-                        self.__gameClass.active_abilities.append(ability)
-                    else:
+                    inner_buffer.append(buffer[current_ability_index])
+                    is_ability_found = False
+                    for index, search_line in enumerate(buffer[current_ability_index+1::]):
+
+                        for expr in NOT_EXACT_ABILITIES_EXPRESSIONS:
+                            res = expr.match(search_line)
+                            if res and len(res.group()) == len(search_line):
+                                is_ability_found = True
+                                break
+                        if is_ability_found:
+                            break
+
+                        inner_buffer.append(search_line)
+
+                    ability = self.__single_ability_handler(inner_buffer)
+                    if ability.type == ABILITIES_SPECIAL_WORDS.PASSIVE:
                         self.__gameClass.passive_abilities.append(ability)
-                ability = GENERAL_ABILITY()
-                ability.name = line
-            elif any(expr.match(line) for expr in TECHNICAL_WORDS_EXPRESSIONS):
-                active_expr = makeSpecialWordsExpressions("активн")
-                passive_expr = makeSpecialWordsExpressions("пассивн")
+                    else:
+                        self.__gameClass.active_abilities.append(ability)
+                    inner_buffer.clear()
+        # this is the last parsing stage for a normal base class
+        self.__stage = BaseClassParser.ABILITIES_PARSED
+
+    def __single_ability_handler(self, buffer):
+        if not isinstance(buffer, list):
+            assert "ability_handler should be provided with list of strings"
+
+        # ====== Preparing ======
+        style_expr = make_special_expression("стил бо")
+        active_expr = makeSpecialWordsExpressions("активн")
+        passive_expr = makeSpecialWordsExpressions("пассивн")
+        is_skip_line_needed = False
+
+        parser = AttributeParser()
+        ability = GENERAL_ABILITY()
+        ability.description = ""
+
+        # ====== Parsing ======
+        for line in buffer:
+            # В некоторых случаях обработчик занимает 2 линии, а не одну. Поэтому нужен пропуск
+            if is_skip_line_needed:
+                is_skip_line_needed = False
+                continue
+
+            # Парсим имя
+            is_name_found = False
+            for expr in NOT_EXACT_ABILITIES_EXPRESSIONS:
+                res = expr.match(line)
+                if res and len(res.group()) == len(line):
+                    ability.name = res.group()
+                    is_name_found = True
+                    break
+            if is_name_found:
+                continue
+
+            # Парсим тип
+            if any(expr.match(line) for expr in ABILITY_TYPE_EXPRESSIONS):
                 if active_expr.match(line.split(" ")[0]):
                     ability.type = ABILITIES_SPECIAL_WORDS.ACTIVE
+                    continue
                 elif passive_expr.match(line.split(" ")[0]):
                     ability.type = ABILITIES_SPECIAL_WORDS.PASSIVE
-            elif LEVEL_AND_COST_EXPRESSION.match(line):
+                    continue
+                elif style_expr.match(line):
+                    ability.type = ABILITIES_SPECIAL_WORDS.STYLE
+                    continue
+
+            # Парсим уровень
+            if LEVEL_AND_COST_EXPRESSION.match(line):
                 level, experience_cost = self.__level_parser(line)
                 new_level = LEVEL()
                 new_level.level = level
                 new_level.cost[COST_SPECIAL_WORDS.EXPERIENCE] = experience_cost
-                ability.levels.append(new_level)
-                current_level = level
-            else:
-                attr = parser.parse_attribute_string(line)
+                print('TESTLOG! ! ! WEIRD LINE', line)
+                next_line = buffer[buffer.index(line)+1]
+                attr = parser.parse_attribute_string(next_line)
                 if attr:
-                    ability.levels[current_level-1].attributes.append(attr)
+                    new_level.attributes.append(attr)
                 else:
-                    ability.description = line
+                    new_level.mechanic = next_line
+                is_skip_line_needed = True
+                ability.levels.append(new_level)
+                continue
 
-        self.__stage = BaseClassParser.ABILITIES_PARSED
-        self.__buffer.clear()
-        '''
+            ability.description += line + " "
+
+        return ability
 
     def __level_parser(self, line):
         level = LEVEL_EXPRESSION.match(line).group().split(" ")[0]
@@ -281,7 +344,10 @@ class BaseClassParser:
         pass
 
     def job_finished_handler(self):
-        pass
+        print("TESTLOG ! ! ! JOB FINISHED")
+        with open('E:\\MisteriumUtilities\\Classes\\%s_class.json' % self.__gameClass.name, 'w') as file:
+            json.dump(self.__gameClass.objToDict(), file)
+        file.close()
 
     STAGE_HANDLERS = (
         class_name_searcher,

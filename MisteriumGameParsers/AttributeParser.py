@@ -148,12 +148,14 @@ class AttributeParser:
         attribute.game_action = game_actions
         attribute.game_action_modifier = game_actions_modifiers
         attribute.game_action_impact = game_actions_impacts
-        if sign_qualifiers[0] in AttributesComponents.NEGATIVE:
-            sign = '-'
-        elif sign_qualifiers[0] in AttributesComponents.POSITIVE:
-            sign = '+'
-        else:
-            sign = '+'
+        sign = '0'
+        if sign_qualifiers:
+            if sign_qualifiers[0] in AttributesComponents.NEGATIVE:
+                sign = '-'
+            elif sign_qualifiers[0] in AttributesComponents.POSITIVE:
+                sign = '+'
+            else:
+                sign = '+'
 
         attribute.sign = sign
         attribute.parameter = parameter

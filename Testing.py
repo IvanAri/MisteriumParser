@@ -20,13 +20,15 @@ textPrettifyParser = BasicParser()
 posts = []
 for post in parser.get_posts():
     textPrettifyParser.process(post.get_content())
-    textPrettifyParser.showResultingContent()
+    # textPrettifyParser.showResultingContent()
     posts.append(textPrettifyParser.getContentAndCleanUp())
 
-gameInfoParser = BaseClassParser()
+baseClassParser = BaseClassParser()
 
 print("=== HERE STARTS GATHERED INFO ===")
-print(posts[6])
+print(len(posts))
+print(posts[28])
+baseClassParser.process(posts[28])
 
 
-gameInfoParser.process(posts[6])
+
